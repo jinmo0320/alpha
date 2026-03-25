@@ -1,5 +1,5 @@
 import { InvestmentPlanReqDto } from "../application/invProfile.dto";
-import { RiskType, InvestmentPlan } from "./invProfile.entity";
+import { RiskType, InvestmentPlan } from "./invPlan.entity";
 
 /**
  * 설문 점수로 투자 성향 결정

@@ -1,4 +1,4 @@
-import { InvProfileRepository } from "../../domain/invProfile.repo";
+import { InvProfileRepository } from "../../domain/invPlan.repo";
 import { UUID } from "crypto";
 
 /**
@@ -6,7 +6,9 @@ import { UUID } from "crypto";
  */
 type GetRiskType = (userId: UUID) => Promise<any>;
 
-export const getRiskType = (deps: { invProfileRepository: InvProfileRepository }): GetRiskType => {
+export const getRiskType = (deps: {
+  invProfileRepository: InvProfileRepository;
+}): GetRiskType => {
   return async (userId: UUID) => {
     const riskType = await deps.invProfileRepository.getRiskType(userId);
     return riskType;

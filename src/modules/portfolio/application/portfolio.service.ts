@@ -1,5 +1,5 @@
 import { PortfolioRepository } from "../domain/portfolio.repo";
-import { InvProfileRepository } from "src/modules/investmentProfile/domain/invProfile.repo";
+import { InvProfileRepository } from "src/modules/investmentProfile/domain/invPlan.repo";
 
 import * as Usecases from "./usecases";
 

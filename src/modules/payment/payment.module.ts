@@ -4,7 +4,7 @@ import { paymentController } from "./presentation/payment.controller";
 import { createPaymentService } from "./application/payment.service";
 import { createPaymentRepository } from "./infrastructure/payment.repo.impl";
 import { createPortfolioRepository } from "../portfolio/infrastructure/portfolio.repo.impl";
-import { createInvProfileRepository } from "../investmentProfile/infrastructure/invProfile.repo.impl";
+import { createInvProfileRepository } from "../investmentProfile/infrastructure/invPlan.repo.impl";
 
 const router = Router();
 

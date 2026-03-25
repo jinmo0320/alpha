@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { InvestmentPlan } from "../domain/invProfile.entity";
+import { InvestmentPlan } from "../domain/invPlan.entity";
 
 export type AssessRiskTypeReqDto = {
   userId: UUID;

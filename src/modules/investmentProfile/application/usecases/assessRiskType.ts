@@ -1,6 +1,6 @@
 import { InvProfileDeps } from "../invProfile.service";
 import { AssessRiskTypeReqDto } from "../invProfile.dto";
-import { RiskType } from "../../domain/invProfile.entity";
+import { RiskType } from "../../domain/invPlan.entity";
 import { determineRiskType } from "../../domain/invProfile.logic";
 import { DomainError } from "src/shared/errors/error";
 import { ErrorCodes } from "src/shared/errors/errorCodes";
