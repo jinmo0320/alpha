@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authenticate } from "src/application/presentation/middlewares/authMiddleware";
 import { invProfileController } from "src/application/presentation/controllers/invProfile.controller";
 import { createInvPlanRepository } from "src/implementation/repository/investmentProfile/invPlan.repository.impl";
-import { createUserRepository } from "src/implementation/repository/user/user.repository.impl";
+import { createUserRepository } from "src/application/repository/user/user.repository.impl";
 import { createPaymentRepository } from "src/implementation/repository/payment/payment.repository.impl";
 import { createPortfolioRepository } from "src/implementation/repository/portfolio/portfolio.repository.impl";
 import { InvProfileService } from "src/application/service/investmentProfile/interface/invProfile.service";

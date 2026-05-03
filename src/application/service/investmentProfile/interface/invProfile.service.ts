@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { InvestmentPlan } from "src/application/repository/investmentProfile/entity/invPlan.entity";
+import { InvestmentPlan } from "src/application/repository/invPlan/invPlan.entity";
 import { User } from "src/application/repository/user/entity/user.entity";
 import {
   AssessRiskTypeReqDto,
