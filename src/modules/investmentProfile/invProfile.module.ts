@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authenticate } from "src/shared/middlewares/authMiddleware";
 import { invProfileController } from "./presentation/invProfile.controller";
 import { createInvProfileService } from "./application/invProfile.service";
-import { createInvProfileRepository } from "./infrastructure/invProfile.repo.impl";
+import { createInvProfileRepository } from "./infrastructure/invPlan.repo.impl";
 import { createPaymentService } from "../payment/application/payment.service";
 import { createPaymentRepository } from "../payment/infrastructure/payment.repo.impl";
 import { createPortfolioRepository } from "../portfolio/infrastructure/portfolio.repo.impl";

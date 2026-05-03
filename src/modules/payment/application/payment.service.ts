@@ -1,6 +1,6 @@
 import { PaymentRepository } from "../domain/payment.repo";
 import { PortfolioRepository } from "src/modules/portfolio/domain/portfolio.repo";
-import { InvProfileRepository } from "src/modules/investmentProfile/domain/invProfile.repo";
+import { InvProfileRepository } from "src/modules/investmentProfile/domain/invPlan.repo";
 import * as Usecases from "./usecases";
 
 export type PaymentDeps = {

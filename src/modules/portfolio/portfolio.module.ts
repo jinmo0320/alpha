@@ -4,7 +4,7 @@ import { loadPortfolio } from "src/shared/middlewares/portfolioMiddleware";
 import { portfolioController } from "./presentation/portoflio.controller";
 import { createPortfolioService } from "./application/portfolio.service";
 import { createPortfolioRepository } from "./infrastructure/portfolio.repo.impl";
-import { createInvProfileRepository } from "../investmentProfile/infrastructure/invProfile.repo.impl";
+import { createInvProfileRepository } from "../investmentProfile/infrastructure/invPlan.repo.impl";
 
 const router = Router();
 

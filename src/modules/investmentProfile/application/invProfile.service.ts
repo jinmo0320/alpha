@@ -1,4 +1,4 @@
-import { InvProfileRepository } from "../domain/invProfile.repo";
+import { InvProfileRepository } from "../domain/invPlan.repo";
 import { PaymentService } from "src/modules/payment/application/payment.service";
 
 import * as Usecases from "./usecases";

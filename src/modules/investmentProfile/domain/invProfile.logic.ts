@@ -1,21 +1,4 @@
-import { InvestmentPlanReqDto } from "../application/invProfile.dto";
-import { RiskType, InvestmentPlan } from "./invProfile.entity";
-
-/**
- * 설문 점수로 투자 성향 결정
- *
- * @param score 총 설문 점수
- * @returns 투자 성향 타입 또는 null (유효하지 않은 점수)
- */
-export const determineRiskType = (score: number): RiskType | null => {
-  if (score >= 10 && score <= 15) return "STABLE";
-  if (score <= 20) return "STABLE_SEEK";
-  if (score <= 25) return "NEUTRAL";
-  if (score <= 30) return "ACTIVE";
-  if (score <= 40) return "AGGRESSIVE";
-
-  return null;
-};
+import { InvestmentPlan } from "./invPlan.entity";
 
 /**
  * 혼합식 투자 최종 금액 계산
@@ -52,7 +35,7 @@ export const calculateFutureValue = (
  * @returns 유효 여부
  */
 export const isValidInvestmentPlan = (
-  plan: Partial<InvestmentPlan>,
+  plan: Partial<InvestmentPlan.CreateInput>,
   tolerance: number = 0.01,
 ): boolean => {
   const {

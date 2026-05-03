@@ -1,11 +1,13 @@
 CREATE TABLE users (
-    id CHAR(36) NOT NULL DEFAULT (UUID()),
+    id CHAR(36) NOT NULL DEFAULT (UUID()) PRIMARY KEY,
     email VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(20) NOT NULL,
     tag VARCHAR(6) NOT NULL,
     password VARCHAR(150) NOT NULL,
+    risk_type ENUM('STABLE', 'STABLE_SEEK', 'NEUTRAL', 'ACTIVE', 'AGGRESSIVE') DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (name, tag)
 );
 
 CREATE TABLE refresh_tokens (
@@ -31,12 +33,176 @@ CREATE TABLE email_verification_status (
     email VARCHAR(50) NOT NULL UNIQUE,
     is_email_verified BOOLEAN DEFAULT FALSE,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
+);
 
 CREATE TABLE survey_questions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  question_text VARCHAR(255) NOT NULL,
-  order_no TINYINT NOT NULL
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question_text VARCHAR(255) NOT NULL,
+    order_no TINYINT NOT NULL
+);
+
+CREATE TABLE survey_answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question_id INT NOT NULL,
+    answer_text VARCHAR(255) NOT NULL,
+    order_no TINYINT NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES survey_questions(id)
+);
+
+CREATE TABLE portfolios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100),
+    description TEXT,
+    status ENUM('PENDING', 'STABLE', 'DISABLED') NOT NULL,
+    min_return DECIMAL(5,4),
+    max_return DECIMAL(5,4),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE portfolio_ownership (
+    user_id CHAR(36) NOT NULL,
+    portfolio_id INT,
+
+    PRIMARY KEY (user_id, portfolio_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE investment_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    initial_amount BIGINT,
+    monthly_amount INT,
+    start_date DATE,
+    payment_day TINYINT,
+    period INT,
+    expected_return DECIMAL(5,4),
+    target_amount BIGINT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE plan_assignment (
+    portfolio_id INT,
+    plan_id INT UNIQUE,
+    version INT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+
+    PRIMARY KEY (portfolio_id, plan_id),
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE,
+    FOREIGN KEY (plan_id) REFERENCES investment_plans(id) ON DELETE CASCADE
+);
+
+CREATE TABLE payment_schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    sequence INT NOT NULL,
+    expected_date DATE NOT NULL,
+    expected_amount INT NOT NULL,
+    status ENUM('PENDING', 'PAID', 'MISSED', 'SKIPPED') DEFAULT 'PENDING',
+    actual_paid_amount INT,
+    actual_paid_date DATETIME,
+
+    portfolio_id INT NOT NULL,
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(20) DEFAULT 'CUSTOM', -- 마스터는 코드 부여, 직접 추가는 CUSTOM
+    name VARCHAR(50) NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+
+    name VARCHAR(50) NOT NULL,
+    description TEXT,
+    min_return DECIMAL(5,4),
+    max_return DECIMAL(5,4),
+
+    UNIQUE (id, category_id),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE item_allocation (
+    portfolio_id INT,
+    item_id INT,
+    category_id INT NOT NULL,
+
+    alias VARCHAR(50),
+    description TEXT,
+    portion DECIMAL(5,4) DEFAULT 0,
+
+    PRIMARY KEY (portfolio_id, item_id),
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id, category_id) REFERENCES items(id, category_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE payment_allocation (
+    schedule_id INT,
+    item_id INT,
+
+    expected_amount INT NOT NULL,
+    status ENUM('PENDING', 'PAID', 'MISSED', 'SKIPPED') DEFAULT 'PENDING',
+    actual_paid_amount INT,
+
+    PRIMARY KEY (schedule_id, item_id),
+    FOREIGN KEY (schedule_id) REFERENCES payment_schedules(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+);
+
+CREATE TABLE item_ownership (
+    user_id CHAR(36) NOT NULL,
+    item_id INT,
+
+    is_private BOOLEAN DEFAULT TRUE,
+
+    PRIMARY KEY (user_id, item_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+);
+
+CREATE TABLE category_ownership (
+    user_id CHAR(36) NOT NULL,
+    category_id INT,
+
+    is_private BOOLEAN DEFAULT TRUE,
+
+    PRIMARY KEY (user_id, category_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE portfolio_presets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    code VARCHAR(20) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    target_return_percent INT NOT NULL,
+    min_return DECIMAL(5,4),
+    max_return DECIMAL(5,4),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE preset_item_allocation (
+    preset_id INT,
+    item_id INT,
+    category_id INT NOT NULL,
+
+    portion DECIMAL(5,4) DEFAULT 0,
+
+    PRIMARY KEY (preset_id, item_id),
+    FOREIGN KEY (preset_id) REFERENCES portfolio_presets(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id, category_id) REFERENCES items(id, category_id) ON DELETE CASCADE
 );
 
 INSERT INTO survey_questions (question_text, order_no) VALUES
@@ -51,179 +217,64 @@ INSERT INTO survey_questions (question_text, order_no) VALUES
     ('투자 수익의 변동성에 대한 생각은?', 9),
     ('다음 중 본인과 가장 가까운 설명은?', 10);
 
-CREATE TABLE survey_answers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  question_id INT NOT NULL,
-  answer_text VARCHAR(255) NOT NULL,
-  order_no TINYINT NOT NULL,
-  FOREIGN KEY (question_id) REFERENCES survey_questions(id)
-);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (1, '원금 보전이 가장 중요', 1),
     (1, '원금 보전 + 소폭 수익', 2),
     (1, '자산의 중장기적 성장', 3),
     (1, '높은 수익 추구 (원금 손실 감수)', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (2, '1년 미만', 1),
     (2, '1년 이상 ~ 3년 미만', 2),
     (2, '3년 이상 ~ 5년 미만', 3),
     (2, '5년 이상', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (3, '10% 미만', 1),
     (3, '10% 이상 ~ 30% 미만', 2),
     (3, '30% 이상 ~ 50% 미만', 3),
     (3, '50% 이상', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (4, '소득이 없거나 매우 불안정', 1),
     (4, '일정한 소득 있으나 여유 없음', 2),
     (4, '안정적 소득과 일부 여유 자금', 3),
     (4, '매우 안정적이며 여유 자금 충분', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (5, '예·적금, CMA', 1),
     (5, '채권형 펀드, MMF', 2),
     (5, '주식형 펀드, ETF, 주식', 3),
     (5, '파생상품, ELW, 가상자산 등', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (6, '거의 없음', 1),
     (6, '기본 구조는 이해', 2),
     (6, '위험·수익 구조 이해', 3),
     (6, '상품 구조와 리스크를 충분히 이해', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (7, '즉시 전량 매도', 1),
     (7, '일부 매도', 2),
     (7, '보유 유지', 3),
     (7, '추가 투자 고려', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (8, '5% 이내', 1),
     (8, '10% 이내', 2),
     (8, '20% 이내', 3),
     (8, '20% 초과 가능', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (9, '변동성이 매우 싫다', 1),
     (9, '낮은 변동성 선호', 2),
     (9, '일정 변동성 감내 가능', 3),
     (9, '변동성이 커도 무관', 4);
-
 INSERT INTO survey_answers (question_id, answer_text, order_no) VALUES
     (10, '안정적 수익만을 추구', 1),
     (10, '안정성과 수익의 균형', 2),
     (10, '수익 중심, 위험 일부 감수', 3),
     (10, '수익 최우선, 위험 적극 감수', 4);
 
-CREATE TABLE investment_profiles (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  user_id CHAR(36) NOT NULL,
-  
-  risk_type ENUM('STABLE', 'STABLE_SEEK', 'NEUTRAL', 'ACTIVE', 'AGGRESSIVE') NULL,
-  
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  
-  CONSTRAINT fk_profile_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  UNIQUE KEY uk_user_profile (user_id)
-);
-
-
-CREATE TABLE master_categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(20) NOT NULL UNIQUE,
-    name VARCHAR(50) NOT NULL,
-    description TEXT
-);
-
-CREATE TABLE master_items (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    description TEXT,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
-    FOREIGN KEY (category_id) REFERENCES master_categories(id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE portfolio_presets (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(20) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    target_return_percent INT NOT NULL,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE portfolio_preset_categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    preset_id INT NOT NULL,
-    master_category_id INT NOT NULL,
-    portion DECIMAL(5,4) NOT NULL,
-    FOREIGN KEY (preset_id) REFERENCES portfolio_presets(id) ON DELETE CASCADE,
-    FOREIGN KEY (master_category_id) REFERENCES master_categories(id) ON DELETE CASCADE
-);
-
-CREATE TABLE portfolio_preset_items (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    preset_id INT NOT NULL,
-    master_item_id INT NOT NULL,
-    portion DECIMAL(5,4) NOT NULL, -- Item은 항상 절대 비중이 Default
-    FOREIGN KEY (preset_id) REFERENCES portfolio_presets(id) ON DELETE CASCADE,
-    FOREIGN KEY (master_item_id) REFERENCES master_items(id) ON DELETE CASCADE
-);
-
-CREATE TABLE user_portfolios (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id CHAR(36) NOT NULL,
-    name VARCHAR(100),
-    description TEXT,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
-    is_customized BOOLEAN DEFAULT FALSE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE user_categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    portfolio_id INT NOT NULL,
-    code VARCHAR(20) DEFAULT 'CUSTOM', -- 마스터는 코드 부여, 직접 추가는 CUSTOM
-    name VARCHAR(50) NOT NULL,
-    description TEXT,
-    portion DECIMAL(5,4) DEFAULT 0,
-    FOREIGN KEY (portfolio_id) REFERENCES user_portfolios(id) ON DELETE CASCADE
-);
-
-CREATE TABLE user_items (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    master_item_id INT NULL,
-    name VARCHAR(50) NOT NULL,
-    description TEXT,
-    portion DECIMAL(5,4) DEFAULT 0,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
-    is_custom_return BOOLEAN DEFAULT FALSE,
-    is_custom BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (category_id) REFERENCES user_categories(id) ON DELETE CASCADE
-);
-
-
-INSERT INTO master_categories (code, name, description) VALUES
+INSERT INTO categories (code, name, description) VALUES
     ('STOCK', '주식', '국내외 주식 자산'),
     ('BOND', '채권', '국내외 채권 자산'),
     ('GOLD', '금', '금 현물 및 관련 자산'),
     ('CASH', '현금', '예적금 및 현금성 자산');
 
-INSERT INTO master_items (id, category_id, name, description, min_return, max_return) VALUES
+INSERT INTO items (id, category_id, name, description, min_return, max_return) VALUES
     -- 주식
     (1, 1, '나스닥100', '미국 나스닥 기술주 중심 투자', 0.105, 0.155),
     (2, 1, 'S&P500', '미국 우량 대형주 분산 투자', 0.075, 0.105),
@@ -259,73 +310,82 @@ INSERT INTO portfolio_presets (id, code, name, description, target_return_percen
     (14, 'PRESET_14', '14% 기술주 주도형 (Lv.2)', '변동성을 감수한 최대 성장 추구', 14, 0.1020, 0.1500),
     (15, 'PRESET_15', '15% 나스닥 올인형', '나스닥 100 지수 완벽 추종', 15, 0.1050, 0.1550);
 
-
-INSERT INTO portfolio_preset_categories (preset_id, master_category_id, portion) VALUES
-    (2, 4, 1.0000), -- 2%: 현금 100
-    (3, 2, 0.4000), (3, 4, 0.6000), -- 3%: 채권 40, 현금 60
-    (4, 1, 0.1000), (4, 2, 0.7000), (4, 4, 0.2000), -- 4%: 주식 10, 채권 70, 현금 20
-    (5, 1, 0.2000), (5, 2, 0.6000), (5, 3, 0.1000), (5, 4, 0.1000), -- 5%: 주식 20, 채권 60, 금 10, 현금 10
-    (6, 1, 0.4000), (6, 2, 0.4500), (6, 3, 0.1000), (6, 4, 0.0500), -- 6%: 주식 40, 채권 45, 금 10, 현금 5
-    (7, 1, 0.6000), (7, 2, 0.3000), (7, 3, 0.1000), -- 7%: 주식 60, 채권 30, 금 10
-    (8, 1, 0.7000), (8, 2, 0.2000), (8, 3, 0.1000), -- 8%: 주식 70, 채권 20, 금 10
-    (9, 1, 0.8000), (9, 2, 0.2000), -- 9%: 주식 80, 채권 20
-    (10, 1, 0.9000), (10, 2, 0.1000), -- 10%: 주식 90, 채권 10
-    (11, 1, 1.0000), (12, 1, 1.0000), (13, 1, 1.0000), (14, 1, 1.0000), (15, 1, 1.0000); -- 11~15%: 주식 100
-
-INSERT INTO portfolio_preset_items (preset_id, master_item_id, portion) VALUES
+INSERT INTO preset_item_allocation (preset_id, item_id, category_id, portion) VALUES
     -- 2% (CMA 100)
-    (2, 14, 1.0000),
+    (2, 14, 4, 1.0000),
     -- 3% (국내중기 40, 예적금 60)
-    (3, 9, 0.4000), (3, 13, 0.6000),
+    (3, 9, 2, 0.4000), (3, 13, 4, 0.6000),
     -- 4% (배당주 10, 우량회사채 40, 국내장기 30, CMA 20)
-    (4, 3, 0.1000), (4, 10, 0.4000), (4, 8, 0.3000), (4, 14, 0.2000),
+    (4, 3, 1, 0.1000), (4, 10, 2, 0.4000), (4, 8, 2, 0.3000), (4, 14, 4, 0.2000),
     -- 5% (S&P500 20, 우량회사채 30, 미국장기 30, 금현물 10, 예적금 10)
-    (5, 2, 0.2000), (5, 10, 0.3000), (5, 6, 0.3000), (5, 12, 0.1000), (5, 13, 0.1000),
+    (5, 2, 1, 0.2000), (5, 10, 2, 0.3000), (5, 6, 2, 0.3000), (5, 12, 3, 0.1000), (5, 13, 4, 0.1000),
     -- 6% (S&P 30, 나스닥 10, 미국장기 30, 우량회사채 15, 금현물 10, CMA 5)
-    (6, 2, 0.3000), (6, 1, 0.1000), (6, 6, 0.3000), (6, 10, 0.1500), (6, 12, 0.1000), (6, 14, 0.0500),
+    (6, 2, 1, 0.3000), (6, 1, 1, 0.1000), (6, 6, 2, 0.3000), (6, 10, 2, 0.1500), (6, 12, 3, 0.1000), (6, 14, 4, 0.0500),
     -- 7% (S&P 40, 나스닥 20, 미국장기 20, 우량회사채 10, 금현물 10)
-    (7, 2, 0.4000), (7, 1, 0.2000), (7, 6, 0.2000), (7, 10, 0.1000), (7, 12, 0.1000),
+    (7, 2, 1, 0.4000), (7, 1, 1, 0.2000), (7, 6, 2, 0.2000), (7, 10, 2, 0.1000), (7, 12, 3, 0.1000),
     -- 8% (S&P 40, 나스닥 30, 미국장기 20, 금현물 10)
-    (8, 2, 0.4000), (8, 1, 0.3000), (8, 6, 0.2000), (8, 12, 0.1000),
+    (8, 2, 1, 0.4000), (8, 1, 1, 0.3000), (8, 6, 2, 0.2000), (8, 12, 3, 0.1000),
     -- 9% (나스닥 40, S&P 40, 미국장기 20)
-    (9, 1, 0.4000), (9, 2, 0.4000), (9, 6, 0.2000),
+    (9, 1, 1, 0.4000), (9, 2, 1, 0.4000), (9, 6, 2, 0.2000),
     -- 10% (나스닥 60, S&P 30, 미국장기 10)
-    (10, 1, 0.6000), (10, 2, 0.3000), (10, 6, 0.1000),
+    (10, 1, 1, 0.6000), (10, 2, 1, 0.3000), (10, 6, 2, 0.1000),
     -- 11% (나스닥 75, S&P 25)
-    (11, 1, 0.7500), (11, 2, 0.2500),
+    (11, 1, 1, 0.7500), (11, 2, 1, 0.2500),
     -- 12% (나스닥 85, S&P 15)
-    (12, 1, 0.8500), (12, 2, 0.1500),
+    (12, 1, 1, 0.8500), (12, 2, 1, 0.1500),
     -- 13% (나스닥 90, S&P 10)
-    (13, 1, 0.9000), (13, 2, 0.1000),
+    (13, 1, 1,  0.9000), (13, 2, 1, 0.1000),
     -- 14% (나스닥 95, S&P 5)
-    (14, 1, 0.9500), (14, 2, 0.0500),
+    (14, 1, 1, 0.9500), (14, 2, 1, 0.0500),
     -- 15% (나스닥 100)
-    (15, 1, 1.0000);
+    (15, 1, 1, 1.0000);
 
-CREATE TABLE investment_plans (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  user_id CHAR(36) NOT NULL,
-  version INT NOT NULL,
-  initial_amount BIGINT NOT NULL,
-  monthly_amount INT NOT NULL,
-  start_date DATE NOT NULL,
-  payment_day TINYINT NOT NULL,
-  period INT NOT NULL,
-  expected_return DECIMAL(5,4) NOT NULL,
-  target_amount BIGINT NOT NULL,
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_plan_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+CREATE TABLE transactions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    item_id INT, -- 현금 입출금일 경우 NULL, 자산 매매일 경우 해당 ID
+    type ENUM('DEPOSIT', 'WITHDRAWAL', 'BUY', 'SELL', 'INTEREST', 'DIVIDEND', 'FEE') NOT NULL,
+    amount DECIMAL(18, 4) NOT NULL, -- 거래 금액 (현금 기준)
+    quantity DECIMAL(18, 8) DEFAULT 0, -- 매수/매도한 수량 (주식, 코인 등)
+    price_per_unit DECIMAL(18, 8), -- 당시 단가
+    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
-CREATE TABLE payment_schedules (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  plan_id BIGINT NOT NULL,
-  sequence INT NOT NULL,
-  expected_date DATE NOT NULL,
-  expected_amount INT NOT NULL,
-  status ENUM('PENDING', 'PAID', 'MISSED', 'SKIPPED') DEFAULT 'PENDING',
-  actual_paid_amount INT,
-  actual_paid_date DATETIME,
-  CONSTRAINT fk_schedule_plan FOREIGN KEY (plan_id) REFERENCES investment_plans(id) ON DELETE CASCADE
+CREATE TABLE item_position (
+    portfolio_id INT NOT NULL,
+    item_id INT NOT NULL,
+    
+    total_quantity DECIMAL(18, 8) DEFAULT 0, -- 현재 보유 수량
+    average_price DECIMAL(18, 8) DEFAULT 0,  -- 평균 매입 단가 (수익률 계산용)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (portfolio_id, item_id),
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
+);
+
+CREATE TABLE item_price_history (
+    item_id INT NOT NULL,
+    price DECIMAL(18, 8) NOT NULL,
+    recorded_date DATE NOT NULL,
+    PRIMARY KEY (item_id, recorded_date),
+    FOREIGN KEY (item_id) REFERENCES items(id)
+);
+
+CREATE TABLE portfolio_item_snapshots (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    item_id INT NOT NULL,
+    category_id INT NOT NULL, -- 카테고리별 통계를 위해 추가
+
+    evaluation_amount BIGINT NOT NULL, -- 해당 자산의 평가 금액 (수량 * 현재가)
+    invested_amount BIGINT NOT NULL,   -- 해당 자산에 들어간 원금
+    recorded_date DATE NOT NULL,
+
+    UNIQUE (portfolio_id, item_id, recorded_date),
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id, category_id) REFERENCES items(id, category_id)
 );
