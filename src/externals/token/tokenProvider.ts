@@ -10,15 +10,3 @@ export type TokenProvider = {
   verifyAccessToken: (token: string) => JwtPayload | null;
   verifyRefreshToken: (token: string) => JwtPayload | null;
 };
-
-export type EmailSender = {
-  sendMail: (email: string, code: string) => Promise<void>;
-};
-
-export type BcryptHelper = {
-  hashPassword: (password: string) => Promise<string>;
-  comparePassword: (
-    password: string,
-    hashedPassword: string,
-  ) => Promise<boolean>;
-};

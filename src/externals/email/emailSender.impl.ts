@@ -3,7 +3,7 @@ import {
   SendEmailCommand,
   SendEmailCommandInput,
 } from "@aws-sdk/client-ses";
-import { EmailSender } from "src/providers/interfaces/auth.external";
+import { EmailSender } from "./emailSender";
 import * as dotenv from "dotenv";
 
 dotenv.config();

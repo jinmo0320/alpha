@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { surveyController } from "src/application/presentation/controllers/survey.controller";
-import { createSurveyRepository } from "src/implementation/repository/survey/survey.repository.impl";
+import { createSurveyRepository } from "src/application/repository/survey/survey.repository.impl";
 import { SurveyService } from "src/application/service/survey/interface/survey.service";
 import * as SurveyUsecases from "src/implementation/service/survey";
 

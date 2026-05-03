@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { DomainError } from "src/errors/error";
-import { getHttpStatus } from "src/errors/errorMapper";
-import { ErrorCodes } from "src/errors/errorCodes";
+import { DomainError } from "src/application/errors/error";
+import { getHttpStatus } from "src/application/errors/errorMapper";
+import { ErrorCodes } from "src/application/errors/errorCodes";
 import { Timer } from "src/utils/timer";
 
 const errorMiddleware = (

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { PortfolioService } from "src/application/service/portfolio/interface/portfolio.service";
-import { DomainError } from "src/errors/error";
-import { ErrorCodes } from "src/errors/errorCodes";
+import { DomainError } from "src/application/errors/error";
+import { ErrorCodes } from "src/application/errors/errorCodes";
 
 export const loadPortfolio = (portfolioService: PortfolioService) => {
   return async (req: Request, res: Response, next: NextFunction) => {

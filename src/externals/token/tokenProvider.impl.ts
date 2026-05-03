@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken";
-import {
-  TokenProvider,
-  JwtPayload,
-} from "src/providers/interfaces/auth.external";
+import { TokenProvider, JwtPayload } from "./tokenProvider";
 
 export const createTokenProvider = (): TokenProvider => {
   const accessSecret = `${process.env.JWT_ACCESS_SECRET}`;

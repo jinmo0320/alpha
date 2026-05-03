@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { DomainError } from "src/errors/error";
-import { ErrorCodes } from "src/errors/errorCodes";
-import { createTokenProvider } from "src/security/tokenProvider";
+import { DomainError } from "src/application/errors/error";
+import { ErrorCodes } from "src/application/errors/errorCodes";
+import { createTokenProvider } from "src/externals/token/tokenProvider.impl";
 
 const TokenProvider = createTokenProvider();
 

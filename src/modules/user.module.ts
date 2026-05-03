@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "src/application/presentation/middlewares/authMiddleware";
 import { createUserRepository } from "src/application/repository/user/user.repository.impl";
-import { createBcryptHelper } from "src/security/bcryptHelper";
+import { createBcryptHelper } from "src/externals/bcrypt/bcryptHelper.impl";
 import { userController } from "src/application/presentation/controllers/user.controller";
 import { UserService } from "src/application/service/user/interface/user.service";
 import * as UserUsecases from "src/implementation/service/user";
