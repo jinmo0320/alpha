@@ -3,14 +3,14 @@ import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpecs from "./swagger/config/swagger";
 
-import authRoutes from "./modules/auth/auth.module";
-import userRoutes from "./modules/user/user.module";
-import surveyRoutes from "./modules/survey/survey.module";
-import invProfileRoutes from "./modules/investmentProfile/invProfile.module";
-import portfolioRoutes from "./modules/portfolio/portfolio.module";
-import paymentRoutes from "./modules/payment/payment.module";
+import authRoutes from "./routers/auth.router";
+import userRoutes from "./routers/user.router";
+import surveyRoutes from "./routers/survey.router";
+import invProfileRoutes from "./routers/invProfile.router";
+import portfolioRoutes from "./routers/portfolio.router";
+import paymentRoutes from "./routers/payment.router";
 
-import errorMiddleware from "./shared/middlewares/errorMiddleware";
+import errorMiddleware from "./middlewares/errorMiddleware";
 
 dotenv.config();
 
