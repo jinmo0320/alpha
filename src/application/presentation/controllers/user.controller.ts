@@ -23,4 +23,23 @@ export const userController = (userService: UserService) => ({
       message: "Password changed successfully",
     });
   },
+
+  /* ================= 투자 성향 평가 ================= */
+  assessInvestmentRisk: async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    const { score } = req.body;
+    const riskType = await userService.setRiskType(userId, score);
+    res.status(200).json({
+      success: true,
+      message: "Updated risk type.",
+      data: { riskType },
+    });
+  },
+
+  /* ================= 투자 성향 초기화 ================= */
+  clearInvestmentRisk: async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    await userService.setRiskType(userId, null);
+    res.status(200).json({ success: true, message: "Cleared risk type." });
+  },
 });

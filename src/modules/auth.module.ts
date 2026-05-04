@@ -1,35 +1,26 @@
 import { Router } from "express";
 
 import { createUserRepository } from "src/application/repository/user/user.repository.impl";
-import { createAuthRepository } from "src/implementation/repository/auth/auth.repository.impl";
+import { createAuthRepository } from "src/application/repository/auth/auth.repository.impl";
 import { createEmailSender } from "src/externals/email/emailSender.impl";
 import { createTokenProvider } from "src/externals/token/tokenProvider.impl";
 import { createBcryptHelper } from "src/externals/bcrypt/bcryptHelper.impl";
 
+import { AuthDeps } from "src/application/service/auth/interface/auth.deps";
 import { AuthService } from "src/application/service/auth/interface/auth.service";
-import * as AuthUsecases from "src/implementation/service/auth";
+import { createAuthService } from "src/application/service/auth/implementation/auth.service.impl";
 import { authContoller } from "src/application/presentation/controllers/auth.controller";
 
 const router = Router();
 
-const deps = {
+const deps: AuthDeps = {
   userRepository: createUserRepository(),
   authRepository: createAuthRepository(),
   TokenProvider: createTokenProvider(),
   EmailSender: createEmailSender(),
   BcryptHelper: createBcryptHelper(),
 };
-
-const service: AuthService = {
-  register: AuthUsecases.createRegister(deps),
-  login: AuthUsecases.createLogin(deps),
-  sendVerificationCode: AuthUsecases.createSendVerificationCode(deps),
-  checkVerificationCode: AuthUsecases.createCheckVerificationCode(deps),
-  sendForgotCode: AuthUsecases.createSendForgotCode(deps),
-  checkForgotCode: AuthUsecases.createCheckForgotCode(deps),
-  resetPassword: AuthUsecases.createResetPassword(deps),
-  refreshToken: AuthUsecases.createRefreshToken(deps),
-};
+const service: AuthService = createAuthService(deps);
 const ctrl = authContoller(service);
 
 router.post("/register", ctrl.register);

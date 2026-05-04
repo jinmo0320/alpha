@@ -1,6 +1,21 @@
 import { User } from "src/application/repository/user/entity/user.entity";
 
 /**
+ * 비밀번호 검증
+ * - 영문자
+ * - 숫자
+ * - 특수문자 !@#$%^&*()_+={}[]|\:;"'<>,.?/-
+ * - 8자 이상
+ * @param password 비밀번호
+ * @returns 비밀번호 형식을 지켰니
+ */
+export const validatePassword = (password: string): boolean => {
+  const passwordRegex =
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/-]).{8,}$/;
+  return passwordRegex.test(password);
+};
+
+/**
  * 설문 점수로 투자 성향 결정
  * @param score 총 설문 점수
  * @returns 투자 성향 타입 또는 null (유효하지 않은 점수)
