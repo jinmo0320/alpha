@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { Portfolio } from "src/application/repository/portfolio/entity/portfolio.entity";
+import { Portfolio } from "../entity/portfolio.entity";
 
 export type CategoryRepository = {
   /**

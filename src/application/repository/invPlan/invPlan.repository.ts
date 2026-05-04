@@ -1,4 +1,4 @@
-import { InvestmentPlan } from "src/application/repository/invPlan/invPlan.entity";
+import { InvestmentPlan } from "./invPlan.entity";
 
 export type InvPlanRepository = {
   /**

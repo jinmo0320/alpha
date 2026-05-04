@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserService } from "src/application/service/user/interface/user.service";
+import { UserService } from "../../service/user/interface/user.service";
 
 export const userController = (userService: UserService) => ({
   /* ================= 내 정보 조회 ================= */

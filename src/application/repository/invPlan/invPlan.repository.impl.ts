@@ -1,6 +1,6 @@
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import db from "src/externals/database/db";
-import { InvPlanRepository } from "src/application/repository/invPlan/invPlan.repository";
+import { InvPlanRepository } from "./invPlan.repository";
 
 export const createInvPlanRepository = (): InvPlanRepository => {
   return {

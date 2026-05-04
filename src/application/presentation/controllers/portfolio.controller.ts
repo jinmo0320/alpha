@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PortfolioService } from "src/application/service/portfolio/interface/portfolio.service";
+import { PortfolioService } from "../../service/portfolio/interface/portfolio.service";
 
 export const portfolioController = (portfolioService: PortfolioService) => ({
   // === 포폴 전체 & 추천 ===

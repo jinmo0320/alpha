@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { PaymentSchedule } from "src/application/repository/payment/payment.entity";
+import { PaymentSchedule } from "./payment.entity";
 
 export type PaymentRepository = {
   // Schedule 관련

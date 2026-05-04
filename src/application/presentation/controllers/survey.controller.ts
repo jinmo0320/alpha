@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { SurveyService } from "src/application/service/survey/interface/survey.service";
+import { SurveyService } from "../../service/survey/interface/survey.service";
 
 export const surveyController = (surveyService: SurveyService) => ({
   getInvestmentQuestions: async (req: Request, res: Response) => {

@@ -1,12 +1,12 @@
 import { UUID } from "crypto";
-import { Portfolio, ExpectedReturn } from "src/application/repository/portfolio/entity/portfolio.entity";
+import { Portfolio } from "../entity/portfolio.entity";
 
 export type PortfolioRepository = {
   /**
    * 사용자 포트폴리오 전체 조회
    * @param userId 사용자 ID
    * @returns 포트폴리오 리스트
-  */
+   */
   getAllPortfolios: (userId: UUID) => Promise<Portfolio.Root[]>;
   getPortfolioByUserId: (userId: UUID) => Promise<Portfolio.Root | null>;
 
@@ -25,7 +25,7 @@ export type PortfolioRepository = {
    * 프리셋 포트폴리오 조회
    * @param targetReturnPercent 목표 수익률
    * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
-  */
+   */
   getPreset(targetReturnPercent: number): Promise<Portfolio.Preset[] | null>;
   findPresetsByReturn: (
     targetReturnPercent: number,

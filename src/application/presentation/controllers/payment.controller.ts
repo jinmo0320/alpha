@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PaymentService } from "src/application/service/payment/interface/payment.service";
+import { PaymentService } from "../../service/payment/interface/payment.service";
 
 export const paymentController = (paymentService: PaymentService) => ({
   getInvestmentProgress: async (req: Request, res: Response) => {

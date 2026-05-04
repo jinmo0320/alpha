@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { InvProfileService } from "src/application/service/investmentProfile/interface/invProfile.service";
+import { InvProfileService } from "../../service/investmentProfile/interface/invProfile.service";
 
 export const invProfileController = (invProfileService: InvProfileService) => ({
   getInvestmentRisk: async (req: Request, res: Response) => {

@@ -1,6 +1,6 @@
 import { RowDataPacket, PoolConnection, ResultSetHeader } from "mysql2/promise";
 import db from "src/externals/database/db";
-import { ItemRepository } from "src/application/repository/portfolio/interface/item.repository";
+import { ItemRepository } from "../interface/item.repository";
 
 export const createItemRepository = (): ItemRepository => {
   return {

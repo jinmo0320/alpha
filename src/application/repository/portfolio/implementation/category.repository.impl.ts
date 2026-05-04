@@ -1,6 +1,6 @@
 import { RowDataPacket, PoolConnection, ResultSetHeader } from "mysql2/promise";
 import db from "src/externals/database/db";
-import { CategoryRepository } from "src/application/repository/portfolio/interface/category.repository";
+import { CategoryRepository } from "../interface/category.repository";
 
 export const createCategoryRepository = (): CategoryRepository => {
   return {
