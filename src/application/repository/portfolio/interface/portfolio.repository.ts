@@ -8,7 +8,6 @@ export type PortfolioRepository = {
    * @returns 포트폴리오 리스트
    */
   getAllPortfolios: (userId: UUID) => Promise<Portfolio.Root[]>;
-  getPortfolioByUserId: (userId: UUID) => Promise<Portfolio.Root | null>;
 
   /**
    * 포트폴리오 상세 조회
@@ -27,9 +26,6 @@ export type PortfolioRepository = {
    * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
    */
   getPreset(targetReturnPercent: number): Promise<Portfolio.Preset[] | null>;
-  findPresetsByReturn: (
-    targetReturnPercent: number,
-  ) => Promise<Portfolio.Preset[]>;
 
   /**
    * 프리셋 기반으로 새로운 포트폴리오 생성
@@ -66,17 +62,6 @@ export type PortfolioRepository = {
   updateCategoryPortions: (
     portfolioId: number,
     portions: { id?: number; categoryId?: number; portion: number }[],
-  ) => Promise<void>;
-
-  addCategory: (
-    portfolioId: number,
-    masterCategoryId?: number,
-    customInfo?: { name?: string; description?: string },
-  ) => Promise<void>;
-
-  updateCategoryInfo: (
-    categoryId: number,
-    info?: { name?: string; description?: string },
   ) => Promise<void>;
 
   /**

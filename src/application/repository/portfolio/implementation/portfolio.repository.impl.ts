@@ -220,12 +220,6 @@ export const createPortfolioRepository = (): PortfolioRepository => {
       return Array.from(portfolioMap.values());
     },
 
-    getPortfolioByUserId: async (userId) => {
-      const portfolios =
-        await createPortfolioRepository().getAllPortfolios(userId);
-      return portfolios[0] ?? null;
-    },
-
     getPortfolio: async (userId, portfolioId) => {
       // 1. 포트폴리오 기본 정보 및 아이템 조회 (기존 유지)
       const [portfolioItems] = await db.execute<RowDataPacket[]>(
@@ -365,12 +359,6 @@ export const createPortfolioRepository = (): PortfolioRepository => {
       }, []);
     },
 
-    findPresetsByReturn: async (targetReturnPercent) => {
-      return (
-        (await createPortfolioRepository().getPreset(targetReturnPercent)) ?? []
-      );
-    },
-
     createPortfolioFromPreset: async (userId, presetCode) => {
       const conn = await db.getConnection();
       try {
@@ -493,31 +481,6 @@ export const createPortfolioRepository = (): PortfolioRepository => {
       } finally {
         conn.release();
       }
-    },
-
-    addCategory: async () => {
-      throw new Error(
-        "Adding an empty category is not supported by the current allocation schema.",
-      );
-    },
-
-    updateCategoryInfo: async (categoryId, info) => {
-      const updates = [];
-      const values = [];
-      if (info?.name !== undefined) {
-        updates.push("name = ?");
-        values.push(info.name);
-      }
-      if (info?.description !== undefined) {
-        updates.push("description = ?");
-        values.push(info.description);
-      }
-      if (updates.length === 0) return;
-      values.push(categoryId);
-      await db.execute(
-        `UPDATE categories SET ${updates.join(", ")} WHERE id = ?`,
-        values,
-      );
     },
 
     deleteCategory: async (portfolioId, categoryId) => {
