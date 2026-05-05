@@ -1,18 +1,18 @@
-import { RowDataPacket } from "mysql2";
-import db from "src/externals/database/db";
-import { PaymentRepository } from "src/application/repository/payment/payment.repository";
-import { PaymentSchedule } from "src/application/repository/payment/payment.entity";
+import { RowDataPacket } from "mysql2/promise";
+import db from "../../../externals/database/db";
+import { PaymentRepository } from "./payment.repository";
+import { PaymentSchedule } from "./payment.entity";
 
 export const createPaymentRepository = (): PaymentRepository => ({
-  getSchedules: async (planId) => {
+  getSchedules: async (projectId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
-      `SELECT * FROM payment_schedules WHERE plan_id = ? ORDER BY sequence ASC`,
-      [planId],
+      `SELECT * FROM payment_schedules WHERE project_id = ? ORDER BY sequence ASC`,
+      [projectId],
     );
 
     return rows.map((row) => ({
       id: Number(row.id),
-      planId: Number(row.plan_id),
+      projectId: Number(row.project_id),
       sequence: Number(row.sequence),
       expectedDate: row.expected_date,
       amount: Number(row.expected_amount),
@@ -28,14 +28,14 @@ export const createPaymentRepository = (): PaymentRepository => ({
   createSchedules: async (schedules) => {
     if (schedules.length === 0) return;
     const values = schedules.map((s) => [
-      s.planId,
       s.sequence,
       s.expectedDate,
       s.amount,
       s.status || "PENDING",
+      s.projectId,
     ]);
     await db.query(
-      `INSERT INTO payment_schedules (plan_id, sequence, expected_date, expected_amount, status) VALUES ?`,
+      `INSERT INTO payment_schedules (sequence, expected_date, expected_amount, status, project_id) VALUES ?`,
       [values],
     );
   },
@@ -52,14 +52,14 @@ export const createPaymentRepository = (): PaymentRepository => ({
   getAllPaidSchedules: async (userId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT ps.* FROM payment_schedules ps
-       JOIN investment_plans ip ON ps.plan_id = ip.id
-       WHERE ip.user_id = ? AND ps.status = 'PAID'`,
+       JOIN projects p ON ps.project_id = p.id
+       WHERE p.user_id = ? AND ps.status = 'PAID'`,
       [userId],
     );
 
     return rows.map((row) => ({
       id: Number(row.id),
-      planId: Number(row.plan_id),
+      projectId: Number(row.project_id),
       sequence: Number(row.sequence),
       expectedDate: row.expected_date,
       amount: Number(row.expected_amount),

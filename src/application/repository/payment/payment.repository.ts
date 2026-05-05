@@ -2,8 +2,7 @@ import { UUID } from "crypto";
 import { PaymentSchedule } from "./payment.entity";
 
 export type PaymentRepository = {
-  // Schedule 관련
-  getSchedules: (planId: number) => Promise<PaymentSchedule[]>;
+  getSchedules: (projectId: number) => Promise<PaymentSchedule[]>;
   createSchedules: (schedules: Partial<PaymentSchedule>[]) => Promise<void>;
   updateSchedulePaid: (
     scheduleId: number,

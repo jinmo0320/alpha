@@ -1,32 +1,19 @@
 import { Router } from "express";
-import { authenticate } from "src/application/presentation/middlewares/authMiddleware";
-import { paymentController } from "src/application/presentation/controllers/payment.controller";
-import { createPaymentRepository } from "src/implementation/repository/payment/payment.repository.impl";
-import { createPortfolioRepository } from "src/implementation/repository/portfolio/portfolio.repository.impl";
-import { createInvPlanRepository } from "src/implementation/repository/investmentProfile/invPlan.repository.impl";
-import { PaymentService } from "src/application/service/payment/interface/payment.service";
-import * as PaymentUsecases from "src/implementation/service/payment";
+import { authenticate } from "../application/presentation/middlewares/authMiddleware";
+import { paymentController } from "../application/presentation/controllers/payment.controller";
+import { createPaymentRepository } from "../application/repository/payment/payment.repository.impl";
+import { createPaymentService } from "../application/service/payment/implementation/payment.service.impl";
 
 const router = Router();
 
-const deps = {
+const service = createPaymentService({
   paymentRepository: createPaymentRepository(),
-  portfolioRepository: createPortfolioRepository(),
-  invPlanRepository: createInvPlanRepository(),
-};
-
-const service: PaymentService = {
-  getInvestmentProgress: PaymentUsecases.getInvestmentProgress(deps),
-  getInvestmentPayments: PaymentUsecases.getInvestmentPayments(deps),
-  recordPayment: PaymentUsecases.recordPayment(deps),
-  generateSchedulesForPlan: PaymentUsecases.generateSchedulesForPlan(deps),
-};
+});
 
 const ctrl = paymentController(service);
 
-// 납입 관련
-router.get("/progress", authenticate, ctrl.getInvestmentProgress);
-router.get("/payments", authenticate, ctrl.getInvestmentPayments);
-router.post("/payments", authenticate, ctrl.recordInvestmentPayment);
+// Detailed progress/schedule generation is paused until the payment model is rebuilt.
+router.get("/", authenticate, ctrl.getPayments);
+router.post("/", authenticate, ctrl.recordPayment);
 
 export default router;

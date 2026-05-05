@@ -1,5 +1,4 @@
 import { UUID } from "crypto";
-import { ExpectedReturn } from "src/application/repository/portfolio/entity/portfolio.entity";
 
 export type CreateFromPresetReqDto = {
   userId: UUID;
@@ -11,35 +10,20 @@ export type UpdateCategoryPortionsReqDto = {
   portions: { id: number; portion: number }[];
 };
 
-export type AddCategoryReqDto = {
-  portfolioId: number;
-  masterCategoryId?: number;
-  customCategoryInfo?: { name: string; description: string };
-};
-
 export type DeleteCategoryReqDto = {
   portfolioId: number;
   categoryId: number;
 };
 
-export type PatchCategoryReqDto = {
+export type GetItemsRelativeReqDto = {
+  portfolioId: number;
   categoryId: number;
-  categoryInfo: { name?: string; description?: string };
 };
 
 export type UpdateItemRelativePortionsReqDto = {
+  portfolioId: number;
   categoryId: number;
   portions: { id: number; portion: number }[];
-};
-
-export type AddItemReqDto = {
-  categoryId: number;
-  masterItemId?: number;
-  customItemInfo?: {
-    name: string;
-    description: string;
-    expectedReturn: ExpectedReturn;
-  };
 };
 
 export type UpdateItemAbsolutePortionsReqDto = {
@@ -52,11 +36,6 @@ export type DeleteItemReqDto = {
   itemId: number;
 };
 
-export type UpdateItemInfoReqDto = {
-  itemId: number;
-  itemInfo: {
-    name?: string;
-    description?: string;
-    expectedReturn?: ExpectedReturn;
-  };
+export type GetAvailableItemsReqDto = {
+  categoryId: number;
 };

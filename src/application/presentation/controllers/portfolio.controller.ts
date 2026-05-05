@@ -55,34 +55,12 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
       .json({ success: true, message: "Asset Categories updated." });
   },
 
-  addCategory: async (req: Request, res: Response) => {
-    const { categoryId } = req.body;
-    const customCategoryInfo = req.body.customCategoryInfo || req.body;
-    await portfolioService.addCategory({
-      portfolioId: req.user!.portfolioId!,
-      masterCategoryId: categoryId,
-      customCategoryInfo,
-    });
-    res.status(201).json({ success: true, message: "Asset Category added." });
-  },
-
   deleteCategory: async (req: Request, res: Response) => {
     await portfolioService.deleteCategory({
-      categoryId: req.user!.portfolioId!,
-      portfolioId: Number(req.params.categoryId),
+      portfolioId: req.user!.portfolioId!,
+      categoryId: Number(req.params.categoryId),
     });
     res.status(200).json({ success: true, message: "Asset Category deleted." });
-  },
-
-  patchCategory: async (req: Request, res: Response) => {
-    const categoryInfo = req.body.categoryInfo || req.body;
-    await portfolioService.updateCategoryInfo({
-      categoryId: Number(req.params.categoryId),
-      categoryInfo,
-    });
-    res
-      .status(200)
-      .json({ success: true, message: "Asset Category info updated." });
   },
 
   getAvailableCategories: async (req: Request, res: Response) => {
@@ -98,9 +76,10 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
 
   // === 자산군 내 하위 자산 ===
   getItemsRelative: async (req: Request, res: Response) => {
-    const items = await portfolioService.getItemsRelative(
-      Number(req.params.categoryId),
-    );
+    const items = await portfolioService.getItemsRelative({
+      portfolioId: req.user!.portfolioId!,
+      categoryId: Number(req.params.categoryId),
+    });
     res.status(200).json({
       success: true,
       message: "상대 비중으로 아이템을 가져왔습니다.",
@@ -110,6 +89,7 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
 
   updateItemRelativePortions: async (req: Request, res: Response) => {
     await portfolioService.updateItemRelativePortions({
+      portfolioId: req.user!.portfolioId!,
       categoryId: Number(req.params.categoryId),
       portions: req.body.itemPortions,
     });
@@ -118,21 +98,10 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
       .json({ success: true, message: "Relative portions updated." });
   },
 
-  addItem: async (req: Request, res: Response) => {
-    const { masterItemId } = req.body;
-    const customItemInfo = req.body.customItemInfo || req.body;
-    await portfolioService.addItem({
-      categoryId: Number(req.params.categoryId),
-      masterItemId,
-      customItemInfo,
-    });
-    res.status(201).json({ success: true, message: "Asset added." });
-  },
-
   getAvailableItems: async (req: Request, res: Response) => {
-    const list = await portfolioService.getAvailableItems(
-      Number(req.params.categoryId),
-    );
+    const list = await portfolioService.getAvailableItems({
+      categoryId: Number(req.params.categoryId),
+    });
     res.status(200).json({
       success: true,
       message: "추가 가능한 아이템을 가져왔습니다.",
@@ -170,14 +139,4 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
     res.status(200).json({ success: true, message: "Asset Item deleted." });
   },
 
-  patchItem: async (req: Request, res: Response) => {
-    const itemInfo = req.body.itemInfo || req.body;
-    await portfolioService.updateItemInfo({
-      itemId: Number(req.params.itemId),
-      itemInfo,
-    });
-    res
-      .status(200)
-      .json({ success: true, message: "Asset Item info updated." });
-  },
 });

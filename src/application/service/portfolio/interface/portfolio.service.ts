@@ -1,17 +1,15 @@
 import { UUID } from "crypto";
-import { Portfolio } from "src/application/repository/portfolio/entity/portfolio.entity";
+import { Portfolio } from "../../../repository/portfolio/entity/portfolio.entity";
 import {
-  AddCategoryReqDto,
-  AddItemReqDto,
   CreateFromPresetReqDto,
   DeleteCategoryReqDto,
   DeleteItemReqDto,
-  PatchCategoryReqDto,
+  GetAvailableItemsReqDto,
+  GetItemsRelativeReqDto,
   UpdateCategoryPortionsReqDto,
   UpdateItemAbsolutePortionsReqDto,
-  UpdateItemInfoReqDto,
   UpdateItemRelativePortionsReqDto,
-} from "src/application/service/portfolio/dto/portfolio.dto";
+} from "../dto/portfolio.dto";
 
 export type PortfolioService = {
   getPortfolio: (userId: UUID) => Promise<Portfolio.Root | null>;
@@ -21,24 +19,20 @@ export type PortfolioService = {
   updateCategoryPortions: (
     req: UpdateCategoryPortionsReqDto,
   ) => Promise<void>;
-  addCategory: (req: AddCategoryReqDto) => Promise<void>;
   deleteCategory: (req: DeleteCategoryReqDto) => Promise<void>;
-  updateCategoryInfo: (req: PatchCategoryReqDto) => Promise<void>;
   getAvailableCategories: (
     portfolioId: number,
   ) => Promise<Portfolio.AvailableCategory[]>;
   getItemsAbsolute: (portfolioId: number) => Promise<Portfolio.Item[]>;
-  getItemsRelative: (categoryId: number) => Promise<Portfolio.Item[]>;
+  getItemsRelative: (req: GetItemsRelativeReqDto) => Promise<Portfolio.Item[]>;
   updateItemAbsolutePortions: (
     req: UpdateItemAbsolutePortionsReqDto,
   ) => Promise<void>;
   updateItemRelativePortions: (
     req: UpdateItemRelativePortionsReqDto,
   ) => Promise<void>;
-  addItem: (req: AddItemReqDto) => Promise<void>;
   deleteItem: (req: DeleteItemReqDto) => Promise<void>;
-  updateItemInfo: (req: UpdateItemInfoReqDto) => Promise<void>;
-  getAvailableItems: (
-    categoryId: number,
-  ) => Promise<Portfolio.AvailableItem[]>;
+  getAvailableItems: (req: GetAvailableItemsReqDto) => Promise<
+    Portfolio.AvailableItem[]
+  >;
 };

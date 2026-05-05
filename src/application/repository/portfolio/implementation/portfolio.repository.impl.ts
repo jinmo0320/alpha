@@ -134,10 +134,11 @@ export const createPortfolioRepository = (): PortfolioRepository => {
           alloc.description as item_description, alloc.portion as item_portion,
           i.min_return as item_min_return, i.max_return as item_max_return
          FROM portfolios po
-         JOIN portfolio_ownership owner ON owner.portfolio_id = po.id
+         JOIN project_portfolios pp ON pp.portfolio_id = po.id
+         JOIN projects pr ON pr.id = pp.project_id
          LEFT JOIN item_allocation alloc ON alloc.portfolio_id = po.id
          LEFT JOIN items i ON i.id = alloc.item_id
-         WHERE owner.user_id = ?
+         WHERE pr.user_id = ?
          ORDER BY po.created_at DESC`,
         [userId],
       );
@@ -155,8 +156,9 @@ export const createPortfolioRepository = (): PortfolioRepository => {
          FROM item_allocation alloc
          JOIN categories ca ON ca.id = alloc.category_id
          JOIN items i ON i.id = alloc.item_id
-         JOIN portfolio_ownership owner ON owner.portfolio_id = alloc.portfolio_id
-         WHERE owner.user_id = ?
+         JOIN project_portfolios pp ON pp.portfolio_id = alloc.portfolio_id
+         JOIN projects pr ON pr.id = pp.project_id
+         WHERE pr.user_id = ?
          GROUP BY alloc.portfolio_id, ca.id`,
         [userId],
       );
@@ -233,10 +235,11 @@ export const createPortfolioRepository = (): PortfolioRepository => {
          items.min_return AS item_min_return,
          items.max_return AS item_max_return
          FROM portfolios po
-         JOIN portfolio_ownership owner ON owner.portfolio_id = po.id
          LEFT JOIN item_allocation alloc ON alloc.portfolio_id = po.id
          LEFT JOIN items ON items.id = alloc.item_id
-         WHERE owner.user_id = ? AND owner.portfolio_id = ?`,
+         JOIN project_portfolios pp ON pp.portfolio_id = po.id
+         JOIN projects pr ON pr.id = pp.project_id
+         WHERE pr.user_id = ? AND po.id = ?`,
         [userId, portfolioId],
       );
 
@@ -382,9 +385,16 @@ export const createPortfolioRepository = (): PortfolioRepository => {
         );
         const newPortfolioId = insertResult.insertId;
 
+        const [projectResult] = await conn.execute<ResultSetHeader>(
+          `INSERT INTO projects (user_id, name, description, status)
+           VALUES (?, ?, ?, 'ACTIVE')`,
+          [userId, preset.name, preset.description],
+        );
+
         await conn.execute(
-          `INSERT INTO portfolio_ownership (user_id, portfolio_id) VALUES (?, ?)`,
-          [userId, newPortfolioId],
+          `INSERT INTO project_portfolios (project_id, portfolio_id, version, is_active)
+           VALUES (?, ?, 1, TRUE)`,
+          [projectResult.insertId, newPortfolioId],
         );
 
         await conn.execute(
