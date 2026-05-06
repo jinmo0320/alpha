@@ -1,0 +1,8 @@
+-- MySQL Docker entrypoint executes every *.sql file in this directory
+-- in lexicographic order. The actual init script is split into:
+-- 01_auth.sql
+-- 02_user_project.sql
+-- 03_portfolio_items.sql
+-- 04_plan.sql
+-- 05_schedules.sql
+-- 06_actual_payment.sql

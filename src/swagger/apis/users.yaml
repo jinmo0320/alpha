@@ -1,0 +1,80 @@
+paths:
+  # ====================================
+  # /users/me (GET)
+  # ====================================
+  /users/me:
+    get:
+      summary: 내 정보 조회
+      tags: [Users]
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: 내 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                TOKEN_REQUIRED:
+                  $ref: "#/components/examples/TOKEN_REQUIRED"
+                TOKEN_INVALID:
+                  $ref: "#/components/examples/TOKEN_INVALID"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                USER_NOT_FOUND:
+                  $ref: "#/components/examples/USER_NOT_FOUND"
+
+  # ====================================
+  # /users/password (PATCH)
+  # ====================================
+  /users/password:
+    patch:
+      summary: 비밀번호 변경
+      tags: [Users]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+      responses:
+        200:
+          description: 비밀번호 변경 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Default"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                WRONG_PASSWORD_FORMAT:
+                  $ref: "#/components/examples/WRONG_PASSWORD_FORMAT"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                TOKEN_REQUIRED:
+                  $ref: "#/components/examples/TOKEN_REQUIRED"
+                TOKEN_INVALID:
+                  $ref: "#/components/examples/TOKEN_INVALID"
+                CURRENT_PASSWORD_NOT_MATCHED:
+                  $ref: "#/components/examples/CURRENT_PASSWORD_NOT_MATCHED"
