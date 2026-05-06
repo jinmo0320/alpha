@@ -3,14 +3,15 @@ import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpecs from "./swagger/config/swagger";
 
-import authRoutes from "./modules/auth/auth.module";
-import userRoutes from "./modules/user/user.module";
-import surveyRoutes from "./modules/survey/survey.module";
-import invProfileRoutes from "./modules/investmentProfile/invProfile.module";
-import portfolioRoutes from "./modules/portfolio/portfolio.module";
-import paymentRoutes from "./modules/payment/payment.module";
+import authRoutes from "./modules/auth.module";
+import userRoutes from "./modules/user.module";
+import surveyRoutes from "./modules/survey.module";
+import planRoutes from "./modules/plan.module";
+import portfolioRoutes from "./modules/portfolio.module";
+import paymentRoutes from "./modules/payment.module";
+import projectRoutes from "./modules/project.module";
 
-import errorMiddleware from "./shared/middlewares/errorMiddleware";
+import errorMiddleware from "./application/presentation/middlewares/errorMiddleware";
 
 dotenv.config();
 
@@ -44,9 +45,10 @@ const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/users/me", userRoutes);
 router.use("/surveys", surveyRoutes);
-router.use("/users/me/investment-profile", invProfileRoutes);
+router.use("/users/me/plan", planRoutes);
 router.use("/users/me/portfolio", portfolioRoutes);
 router.use("/users/me/payment", paymentRoutes);
+router.use("/projects", projectRoutes);
 
 app.use("/api/v1", router);
 

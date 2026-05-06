@@ -1,0 +1,43 @@
+import { User } from "src/application/repository/user/entity/user.entity";
+
+export type RegisterReqDto = {
+  email: string;
+  password: string;
+};
+
+export type RegisterResDto = {
+  accessToken: string;
+  refreshToken: string;
+  user: User.Info;
+};
+
+export type LoginReqDto = {
+  email: string;
+  password: string;
+};
+
+export type LoginResDto = {
+  accessToken: string;
+  refreshToken: string;
+  user: User.Info;
+};
+
+export type SendCodeResDto = {
+  createdAt: string;
+  expiredAt: string;
+};
+
+export type CheckCodeReqDto = {
+  email: string;
+  code: string;
+};
+
+export type ResetPasswordReqDto = {
+  email: string;
+  newPassword: string;
+};
+
+export type RefreshTokenResDto = {
+  accessToken: string;
+  refreshToken: string;
+};
