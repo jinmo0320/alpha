@@ -121,11 +121,11 @@ export const createAuthService = ({
         "The email format is incorrect.",
       );
 
-    /* [Error] 가입되지 않은 이메일 */
-    if (!(await userRepository.findUserByEmail(email)))
+    /* [Error] 이미 가입된 이메일 */
+    if (await userRepository.findUserByEmail(email))
       throw new DomainError(
-        ErrorCodes.AUTH.EMAIL_NOT_REGISTERED,
-        "You cannot retrieve your password with an unregistered email address.",
+        ErrorCodes.AUTH.EMAIL_ALREADY_REGISTERED,
+        "This email address is already registered.",
       );
 
     /* 0. 인증코드 생성 */

@@ -4,15 +4,15 @@ on:
   push:
     branches: [main]
 
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_URI: ${{ secrets.AWS_ECR_URI }}
+  IMAGE_URI: ${{ secrets.AWS_ECR_URI }}/prod/torium-repo
+
 jobs:
   # 1. 빌드 및 ECR 푸시
   build-and-push:
     runs-on: ubuntu-latest
-
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_URI: ${{ secrets.AWS_ECR_URI }}
-      IMAGE_REPO: prod/torium-repo
 
     steps:
       - name: Checkout code
@@ -34,46 +34,37 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push docker image
-        env:
-          ECR_URI: ${{ secrets.AWS_ECR_URI }}
-          IMAGE_REPO: prod/torium-repo
         run: |
           IMAGE_TAG=latest
           BUILD_TAG=${GITHUB_RUN_NUMBER:-${GITHUB_RUN_ID}}
-          FULL_IMAGE="${ECR_URI}/${IMAGE_REPO}"
           # Build
-          docker build --build-arg NODE_ENV=production -t ${FULL_IMAGE}:${IMAGE_TAG} .
-          docker tag ${FULL_IMAGE}:${IMAGE_TAG} ${FULL_IMAGE}:${BUILD_TAG}
+          docker build -t ${IMAGE_URI}:${IMAGE_TAG} .
+          docker tag ${IMAGE_URI}:${IMAGE_TAG} ${IMAGE_URI}:${BUILD_TAG}
           # Push both tags
-          docker push ${FULL_IMAGE}:${IMAGE_TAG}
-          docker push ${FULL_IMAGE}:${BUILD_TAG}
+          docker push ${IMAGE_URI}:${IMAGE_TAG}
+          docker push ${IMAGE_URI}:${BUILD_TAG}
 
   # 2. SSM을 통한 배포
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    env:
-      ECR_URI: ${{ secrets.AWS_ECR_URI }}
-      IMAGE_REPO: prod/torium-repo
-      HOST_PORT: 3000 # EC2에서 열어줄 포트
-      CONTAINER_PORT: 3000 # Node.js 앱이 사용하는 포트
 
     steps:
       - name: Checkout deploy files
         uses: actions/checkout@v5
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to EC2 via SSM
         run: |
@@ -91,14 +82,13 @@ jobs:
           cd "\$DEPLOY_DIR"
 
           # ECR 로그인
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_URI
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URI
 
           # Parameter Store에서 .env 안전하게 가져오기
           aws ssm get-parameter --name "/torium/prod/env" --with-decryption --query "Parameter.Value" --output text > .env
+
           # Compose가 ECR 서버 이미지를 사용하도록 이미지 주소 주입
-          printf '\nTORIUM_IMAGE=%s\n' "$ECR_URI/$IMAGE_REPO:latest" >> .env
-          # 포트 값은 workflow env를 Compose env로 전달
-          printf 'HOST_PORT=%s\nCONTAINER_PORT=%s\n' "$HOST_PORT" "$CONTAINER_PORT" >> .env
+          printf '\nTORIUM_IMAGE=%s\n' "$IMAGE_URI:latest" >> .env
 
           # Compose 파일과 MySQL 초기화 SQL 배치
           printf '%s' "$DEPLOY_BUNDLE" | base64 -d | tar -xzf - -C "\$DEPLOY_DIR"
@@ -114,7 +104,7 @@ jobs:
           fi
 
           # Docker 배포
-          docker pull $ECR_URI/$IMAGE_REPO:latest
+          docker pull $IMAGE_URI:latest
           # 서버와 MySQL 컨테이너를 Compose로 함께 실행
           \$COMPOSE up -d --no-build
 
