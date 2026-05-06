@@ -11,7 +11,7 @@ services:
       TZ: Asia/Seoul
     ports:
       # DB 포트는 EC2 내부에서만 접근 가능하게 제한
-      - "127.0.0.1:${DB_PORT:-3306}:3306"
+      - "127.0.0.1:3306:3306"
     command:
       - --skip-character-set-client-handshake
       - --character-set-server=utf8mb4
@@ -31,14 +31,11 @@ services:
     container_name: torium-server
     ports:
       # 서버 포트도 로컬/프록시에서만 접근 가능하게 제한
-      - "127.0.0.1:${HOST_PORT:-3000}:${CONTAINER_PORT:-3000}"
+      - "127.0.0.1:3000:3000"
     env_file:
       - .env
     environment:
-      # docker의 db container로 MySQL에 접속
       DB_HOST: db
-      DB_USER: root
-      DB_PORT: 3306
     restart: always
     depends_on:
       - db
