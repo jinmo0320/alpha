@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { Portfolio, ExpectedReturn } from "../entity/portfolio.entity";
+import { ExpectedReturn, Portfolio } from "src/application/model/portfolio.model";
 
 export type ItemRepository = {
   /**

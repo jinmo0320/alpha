@@ -3,7 +3,7 @@ import { authenticate } from "../application/presentation/middlewares/authMiddle
 import { loadPortfolio } from "../application/presentation/middlewares/portfolioMiddleware";
 import { portfolioController } from "../application/presentation/controllers/portfolio.controller";
 import { createPortfolioRepository } from "../application/repository/portfolio/implementation/portfolio.repository.impl";
-import { createPortfolioService } from "../application/service/portfolio/implementation/portfolio.service.impl";
+import { createPortfolioService } from "../application/service/portfolio/portfolio.service.impl";
 
 const router = Router();
 

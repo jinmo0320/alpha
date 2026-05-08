@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../application/presentation/middlewares/authMiddleware";
 import { paymentController } from "../application/presentation/controllers/payment.controller";
 import { createPaymentRepository } from "../application/repository/payment/payment.repository.impl";
-import { createPaymentService } from "../application/service/payment/implementation/payment.service.impl";
+import { createPaymentService } from "../application/service/payment/payment.service.impl";
 
 const router = Router();
 

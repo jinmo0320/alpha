@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import db from "src/externals/database/db";
 import { SurveyRepository } from "src/application/repository/survey/survey.repository";
-import { Survey } from "src/application/repository/survey/entity/survey.entity";
+import { Survey } from "src/application/model/survey.model";
 
 export const createSurveyRepository = (): SurveyRepository => ({
   getInvestmentQuestions: async () => {

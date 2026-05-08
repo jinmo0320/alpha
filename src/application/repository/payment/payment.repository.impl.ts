@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2/promise";
 import db from "../../../externals/database/db";
+import { PaymentSchedule } from "src/application/model/payment.model";
 import { PaymentRepository } from "./payment.repository";
-import { PaymentSchedule } from "./payment.entity";
 
 export const createPaymentRepository = (): PaymentRepository => ({
   getSchedules: async (projectId) => {

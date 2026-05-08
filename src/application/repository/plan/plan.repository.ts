@@ -1,4 +1,4 @@
-import { Plan } from "./plan.entity";
+import { Plan } from "src/application/model/plan.model";
 
 export type PlanRepository = {
   getActivePlan: (projectId: number) => Promise<Plan.Root | null>;

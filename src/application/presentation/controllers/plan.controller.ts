@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { PlanService } from "../../service/plan/interface/plan.service";
-import { isValidPlanReqDto } from "../../service/plan/dto/plan.dto";
+import { isValidPlanReqDto } from "src/application/model/plan.model";
+import { PlanService } from "../../service/plan/plan.service";
 
 const readProjectId = (value: unknown): number | null => {
   const projectId = Number(value);

@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import db from "src/externals/database/db";
 import { UserRepository } from "src/application/repository/user/user.repository";
-import { User } from "src/application/repository/user/entity/user.entity";
+import { User } from "src/application/model/user.model";
 
 export const createUserRepository = (): UserRepository => ({
   createUser: async (user) => {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AuthService } from "../../service/auth/interface/auth.service";
+import { AuthService } from "../../service/auth/auth.service";
 
 export const authContoller = (authService: AuthService) => ({
   /* ================= 회원가입 ================= */

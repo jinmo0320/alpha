@@ -65,6 +65,10 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. Explain what you have done in easy-to-understand sentences
+
+After completing all requirements, provide a detailed explanation of what you have done in easy-to-understand sentences.
+
 ## 주의점
 
 단순 작업일 경우에는 위 과정을 모두 지키느라 시간과 에너지를 과도하게 사용할 필요없다.

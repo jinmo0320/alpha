@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../application/presentation/middlewares/authMiddleware";
 import { planController } from "../application/presentation/controllers/plan.controller";
 import { createPlanRepository } from "../application/repository/plan/plan.repository.impl";
-import { createPlanService } from "../application/service/plan/implementation/plan.service.impl";
+import { createPlanService } from "../application/service/plan/plan.service.impl";
 
 const router = Router();
 

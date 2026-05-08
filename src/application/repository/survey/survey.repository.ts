@@ -1,4 +1,4 @@
-import { Survey } from "src/application/repository/survey/entity/survey.entity";
+import { Survey } from "src/application/model/survey.model";
 
 export type SurveyRepository = {
   /**

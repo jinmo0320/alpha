@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { PaymentSchedule } from "./payment.entity";
+import { PaymentSchedule } from "src/application/model/payment.model";
 
 export type PaymentRepository = {
   getSchedules: (projectId: number) => Promise<PaymentSchedule[]>;

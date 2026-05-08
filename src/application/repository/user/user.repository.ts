@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { User } from "src/application/repository/user/entity/user.entity";
+import { User } from "src/application/model/user.model";
 
 export type UserRepository = {
   /**

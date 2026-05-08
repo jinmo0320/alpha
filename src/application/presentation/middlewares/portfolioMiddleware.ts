@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { PortfolioService } from "src/application/service/portfolio/interface/portfolio.service";
+import { PortfolioService } from "src/application/service/portfolio/portfolio.service";
 import { DomainError } from "src/application/errors/error";
 import { ErrorCodes } from "src/application/errors/errorCodes";
 
