@@ -1,9 +1,15 @@
 import { Plan } from "src/application/model/plan.model";
 
 export type PlanRepository = {
-  getActivePlan: (projectId: number) => Promise<Plan.Root | null>;
-  getAllPlans: (projectId: number) => Promise<Plan.Root[]>;
-  createPlan: (projectId: number, data: Plan.CreateInput) => Promise<number>;
-  updatePlan: (planId: number, data: Plan.UpdateInput) => Promise<void>;
-  deactivatePlans: (projectId: number) => Promise<void>;
+  /**
+   * create a plan with MTrF data
+   * @param req project id and MTrF data
+   */
+  createPlan: (req: Plan.Req.Create) => Promise<void>;
+  /**
+   * get the plan of a project
+   * @param projectId project id
+   * @returns the plan if found, otherwise null
+   */
+  getPlan: (projectId: number) => Promise<Plan.Entity | null>;
 };

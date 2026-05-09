@@ -1,95 +1,73 @@
+import exp from "constants";
 import { UUID } from "crypto";
-
-export type ExpectedReturn = {
-  min: number;
-  max: number;
-};
+import { Category } from "./category.model";
+import { Item } from "./item.model";
 
 export namespace Portfolio {
-  export type Root = {
+  export type Entity = {
     id: number;
     name: string;
-    description: string;
     status: "PENDING" | "STABLE" | "DISABLED";
-    categories: Category[];
-    items: Item[];
-    expectedReturn: ExpectedReturn;
-    createdAt: string;
-    updatedAt: string;
+    minReturn: number;
+    maxReturn: number;
+    createdAt: Date;
+    updatedAt: Date;
   };
 
-  export type Category = {
-    id: number;
-    code: string;
-    name: string;
-    description: string;
-    portion: number;
-    expectedReturn: ExpectedReturn;
-  };
+  export namespace Res {
+    export type Root = Entity & {
+      categories: Category.Entity & {
+        portion: number;
+        minReturn: number;
+        maxReturn: number;
+        items: Item.Entity & {
+          portion: number;
+          alias: string;
+          aliasDescription: string;
+        };
+      };
+      isActive: boolean;
+    };
+  }
 
-  export type Item = {
-    id: number;
-    categoryId: number;
-    name: string;
-    description: string;
-    portion: number; // 자산의 절대 비중
-    expectedReturn: ExpectedReturn;
-  };
+  export namespace Req {
+    export type Create = {
+      projectId: number;
+      presetCode: string;
+    };
 
-  export type Preset = {
-    code: string;
-    name: string;
-    description: string;
-    categories: Pick<Category, "name" | "portion">[];
-    items: Pick<Item, "id" | "portion">[];
-    targetReturnPercent: number;
-    expectedReturn: ExpectedReturn;
-  };
-
-  export type AvailableCategory = Pick<Category, "id" | "name" | "description">;
-
-  export type AvailableItem = Pick<
-    Item,
-    "id" | "categoryId" | "name" | "description" | "expectedReturn"
-  >;
+    export type Set = {
+      portfolioId: number;
+      items: {
+        itemId: number;
+        portion: number;
+        alias?: string;
+        aliasDescription?: string;
+      };
+    };
+  }
 }
 
-export type CreateFromPresetReqDto = {
-  userId: UUID;
-  presetCode: string;
-};
+export namespace Preset {
+  export type Entity = {
+    code: string;
+    name: string;
+    description: string;
+    targetReturnPercent: number;
+    minReturn: number;
+    maxReturn: number;
+  };
 
-export type UpdateCategoryPortionsReqDto = {
-  portfolioId: number;
-  portions: { id: number; portion: number }[];
-};
-
-export type DeleteCategoryReqDto = {
-  portfolioId: number;
-  categoryId: number;
-};
-
-export type GetItemsRelativeReqDto = {
-  portfolioId: number;
-  categoryId: number;
-};
-
-export type UpdateItemRelativePortionsReqDto = {
-  portfolioId: number;
-  categoryId: number;
-  portions: { id: number; portion: number }[];
-};
-
-export type UpdateItemAbsolutePortionsReqDto = {
-  portfolioId: number;
-  portions: { id: number; portion: number }[];
-};
-
-export type DeleteItemReqDto = {
-  portfolioId: number;
-  itemId: number;
-};
-
-export type GetAvailableItemsReqDto = {
-  categoryId: number;
-};
+  export namespace Res {
+    export type Root = Entity & {
+      categories: Category.Entity & {
+        portion: number;
+        minReturn: number;
+        maxReturn: number;
+        items: Item.Entity & {
+          portion: number;
+        };
+      };
+    };
+  }
+}

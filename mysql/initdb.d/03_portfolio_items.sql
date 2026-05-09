@@ -2,8 +2,7 @@ CREATE TABLE portfolios (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
     name VARCHAR(100),
-    description TEXT,
-    status ENUM('PENDING', 'STABLE', 'DISABLED') NOT NULL,
+    status ENUM('PENDING', 'STABLE', 'DISABLED') NOT NULL DEFAULT 'PENDING',
     min_return DECIMAL(5,4),
     max_return DECIMAL(5,4),
 
@@ -14,7 +13,7 @@ CREATE TABLE portfolios (
 CREATE TABLE project_portfolios (
     project_id INT NOT NULL,
     portfolio_id INT NOT NULL,
-    version INT NOT NULL,
+    version INT NOT NULL DEFAULT 1,
     is_active BOOLEAN DEFAULT TRUE,
 
     PRIMARY KEY (project_id, portfolio_id),
@@ -50,7 +49,7 @@ CREATE TABLE item_allocation (
     category_id INT NOT NULL,
 
     alias VARCHAR(50),
-    description TEXT,
+    alias_description TEXT,
     portion DECIMAL(5,4) DEFAULT 0,
 
     PRIMARY KEY (portfolio_id, item_id),

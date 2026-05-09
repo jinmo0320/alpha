@@ -1,38 +1,48 @@
 import { UUID } from "crypto";
-import {
-  CreateFromPresetReqDto,
-  DeleteCategoryReqDto,
-  DeleteItemReqDto,
-  GetAvailableItemsReqDto,
-  GetItemsRelativeReqDto,
-  UpdateCategoryPortionsReqDto,
-  UpdateItemAbsolutePortionsReqDto,
-  UpdateItemRelativePortionsReqDto,
-  Portfolio,
-} from "src/application/model/portfolio.model";
+import { Category } from "src/application/model/category.model";
+import { Item } from "src/application/model/item.model";
+import { Portfolio, Preset } from "src/application/model/portfolio.model";
 
 export type PortfolioService = {
-  getPortfolio: (userId: UUID) => Promise<Portfolio.Root | null>;
-  getRecommendations: (userId: UUID) => Promise<Portfolio.Preset[]>;
-  createFromPreset: (req: CreateFromPresetReqDto) => Promise<void>;
-  getCategories: (portfolioId: number) => Promise<Portfolio.Category[]>;
-  updateCategoryPortions: (
-    req: UpdateCategoryPortionsReqDto,
-  ) => Promise<void>;
-  deleteCategory: (req: DeleteCategoryReqDto) => Promise<void>;
-  getAvailableCategories: (
-    portfolioId: number,
-  ) => Promise<Portfolio.AvailableCategory[]>;
-  getItemsAbsolute: (portfolioId: number) => Promise<Portfolio.Item[]>;
-  getItemsRelative: (req: GetItemsRelativeReqDto) => Promise<Portfolio.Item[]>;
-  updateItemAbsolutePortions: (
-    req: UpdateItemAbsolutePortionsReqDto,
-  ) => Promise<void>;
-  updateItemRelativePortions: (
-    req: UpdateItemRelativePortionsReqDto,
-  ) => Promise<void>;
-  deleteItem: (req: DeleteItemReqDto) => Promise<void>;
-  getAvailableItems: (req: GetAvailableItemsReqDto) => Promise<
-    Portfolio.AvailableItem[]
-  >;
+  /**
+   * gets activated portfolio of project
+   * @param projectId project id
+   * @returns full portfolio spec of the project, or null if not found
+   */
+  getPortfolio: (projectId: number) => Promise<Portfolio.Res.Root | null>;
+
+  /**
+   * gets recommended portfolios preset for a user
+   * @param projectId project id
+   * @returns array of recommended portfolios
+   */
+  recommendPresets: (projectId: number) => Promise<Preset.Res.Root[]>;
+
+  /**
+   * creates a portfolio for the user based on the preset code
+   * @param req project id and preset code
+   * @returns full portfolio spec
+   */
+  createFromPreset: (req: Portfolio.Req.Create) => Promise<Portfolio.Res.Root>;
+
+  /**
+   * sets portfolio items with portion
+   * @param req portfolio id and items with portion
+   * @return full portfolio spec
+   */
+  setPortfolio: (req: Portfolio.Req.Set) => Promise<Portfolio.Res.Root>;
+
+  /**
+   * gets available categories for the portfolio
+   * @param portfolioId portfolio id
+   * @returns available categories
+   */
+  getAvailableCategories: (portfolioId: number) => Promise<Category.Res.Root[]>;
+
+  /**
+   * gets available items for the category in the portfolio
+   * @param req portfolio id and category id
+   * @returns available items
+   */
+  getAvailableItems: (req: Item.Req.Available) => Promise<Item.Res.Root[]>;
 };

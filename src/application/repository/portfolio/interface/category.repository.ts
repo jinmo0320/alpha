@@ -1,32 +1,24 @@
 import { UUID } from "crypto";
-import { Portfolio } from "src/application/model/portfolio.model";
+import { Category } from "src/application/model/category.model";
 
 export type CategoryRepository = {
   /**
    * 사용자가 소유한 모든 카테고리를 반환
    * @param userId 사용자 ID
    */
-  getAll: (userId: UUID) => Promise<Portfolio.Category[]>;
+  getAll: (userId: UUID) => Promise<Category.Entity[]>;
 
   /**
    * 새로운 카테고리를 생성
-   * @param userId 사용자 ID
-   * @param info 카테고리 정보 (이름, 설명)
+   * @param req 카테고리 생성에 필요한 정보 (사용자 ID, 이름, 설명)
    */
-  create: (
-    userId: UUID,
-    info: { name: string; description?: string },
-  ) => Promise<void>;
+  create: (req: Category.Req.Create) => Promise<Category.Entity>;
 
   /**
    * 기존 카테고리를 업데이트
-   * @param categoryId 업데이트할 카테고리 ID
-   * @param info 업데이트할 카테고리 정보 (이름, 설명)
+   * @param req 업데이트할 카테고리 정보 (카테고리 ID, 이름, 설명)
    */
-  update: (
-    categoryId: number,
-    info?: { name?: string; description?: string },
-  ) => Promise<void>;
+  update: (req: Category.Req.Update) => Promise<Category.Entity>;
 
   /**
    * 카테고리를 삭제

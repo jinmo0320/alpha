@@ -1,13 +1,16 @@
-import {
-  CreatePlanReqDto,
-  GetPlanReqDto,
-  Plan,
-  UpdatePlanReqDto,
-} from "src/application/model/plan.model";
+import { Plan } from "src/application/model/plan.model";
 
 export type PlanService = {
-  getPlan: (req: GetPlanReqDto) => Promise<Plan.Root | null>;
-  createPlan: (req: CreatePlanReqDto) => Promise<void>;
-  updatePlan: (req: UpdatePlanReqDto) => Promise<void>;
-  clearPlan: (projectId: number) => Promise<void>;
+  /**
+   * creates a new plan
+   * @param mtrf MTrF simulation request
+   */
+  createPlan: (mtrf: Plan.Req.Simulation) => Promise<void>;
+
+  /**
+   * gets a plan by project id
+   * @param projectId project id
+   * @returns plan or null if not found
+   */
+  getPlan: (projectId: number) => Promise<Plan.Res.Root | null>;
 };

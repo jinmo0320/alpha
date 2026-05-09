@@ -1,19 +1,25 @@
 import { UUID } from "crypto";
+import { Portfolio } from "./portfolio.model";
+import { Plan } from "./plan.model";
 
-export namespace ProjectDto {
-  export namespace Response {
-    export type Abstract = {
-      id: number;
-      name: string;
-      status: "STABLE" | "PENDING" | "DISABLED";
-      createdAt: Date;
-      updatedAt: Date;
+export namespace Project {
+  export type Entity = {
+    id: number;
+    name: string;
+    status: "PENDING" | "STABLE" | "DISABLED";
+    createdAt: Date;
+    updatedAt: Date;
+  };
+
+  export namespace Res {
+    export type Abstract = Entity;
+    export type Detail = Entity & {
+      portfolio: Portfolio.Res.Root;
+      plan: Plan.Res.Root;
     };
-
-    export type Detail = Abstract & {};
   }
 
-  export namespace Request {
+  export namespace Req {
     export type Create = {
       userId: UUID;
       name: string;
