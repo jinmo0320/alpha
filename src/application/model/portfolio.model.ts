@@ -12,22 +12,23 @@ export namespace Portfolio {
     updatedAt: Date;
   };
 
-  export namespace Entity {
-    export type Item = Item.Entity & {
-      portion: number;
-      alias: string;
-      aliasDescription: string;
-    };
-  }
-
   export namespace Res {
     export type Root = Entity & {
       categories: (Category.Entity & {
         portion: number;
         minReturn: number;
         maxReturn: number;
+<<<<<<< HEAD
         items: Entity.Item[];
       })[];
+=======
+        items: Item.Entity & {
+          portion: number;
+          alias: string;
+          aliasDescription: string;
+        };
+      };
+>>>>>>> parent of 129b1f1 (add getItemsInPortfolio)
       isActive: boolean;
     };
   }

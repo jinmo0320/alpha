@@ -3,8 +3,8 @@ CREATE TABLE portfolios (
 
     name VARCHAR(100),
     status ENUM('PENDING', 'STABLE', 'DISABLED') NOT NULL DEFAULT 'PENDING',
-    min_return DECIMAL(5,4) NOT NULL,
-    max_return DECIMAL(5,4) NOT NULL,
+    min_return DECIMAL(5,4),
+    max_return DECIMAL(5,4),
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -36,8 +36,8 @@ CREATE TABLE items (
 
     name VARCHAR(50) NOT NULL,
     description TEXT,
-    min_return DECIMAL(5,4) NOT NULL,
-    max_return DECIMAL(5,4) NOT NULL,
+    min_return DECIMAL(5,4),
+    max_return DECIMAL(5,4),
 
     UNIQUE (id, category_id),
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
@@ -86,8 +86,8 @@ CREATE TABLE portfolio_presets (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     target_return_percent INT NOT NULL,
-    min_return DECIMAL(5,4) NOT NULL,
-    max_return DECIMAL(5,4) NOT NULL,
+    min_return DECIMAL(5,4),
+    max_return DECIMAL(5,4),
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

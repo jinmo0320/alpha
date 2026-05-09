@@ -11,8 +11,8 @@ const mapPortfolio = (row: RowDataPacket): Portfolio.Entity => ({
   id: Number(row.id),
   name: row.name,
   status: row.status,
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
+  minReturn: Number(row.minReturn ?? 0),
+  maxReturn: Number(row.maxReturn ?? 0),
   createdAt: new Date(row.createdAt),
   updatedAt: new Date(row.updatedAt),
 });
@@ -22,8 +22,8 @@ const mapPreset = (row: RowDataPacket): Preset.Entity => ({
   name: row.name,
   description: row.description ?? "",
   targetReturnPercent: Number(row.targetReturnPercent),
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
+  minReturn: Number(row.minReturn ?? 0),
+  maxReturn: Number(row.maxReturn ?? 0),
 });
 
 const mapCategory = (row: RowDataPacket): Category.Entity => ({
@@ -38,8 +38,8 @@ const mapItem = (row: RowDataPacket): Item.Entity => ({
   categoryId: Number(row.categoryId),
   name: row.name,
   description: row.description ?? "",
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
+  minReturn: Number(row.minReturn ?? 0),
+  maxReturn: Number(row.maxReturn ?? 0),
 });
 
 const getPortfolioById = async (
@@ -130,6 +130,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     return rows.length > 0 ? mapPortfolio(rows[0]) : null;
   },
 
+<<<<<<< HEAD
   getItemsInPortfolio: async (portfolioId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
@@ -189,6 +190,8 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     }));
   },
 
+=======
+>>>>>>> parent of 129b1f1 (add getItemsInPortfolio)
   getPreset: async (targetReturnPercent) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT

@@ -8,8 +8,8 @@ const mapItem = (row: RowDataPacket): Item.Entity => ({
   categoryId: Number(row.categoryId),
   name: row.name,
   description: row.description ?? "",
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
+  minReturn: Number(row.minReturn ?? 0),
+  maxReturn: Number(row.maxReturn ?? 0),
 });
 
 const getItemById = async (itemId: number): Promise<Item.Entity | null> => {
