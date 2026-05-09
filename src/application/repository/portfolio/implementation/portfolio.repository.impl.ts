@@ -162,6 +162,33 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     }));
   },
 
+  getCategoriesInPortfolio: async (portfolioId) => {
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT
+        c.id,
+        c.code,
+        c.name,
+        c.description,
+        COALESCE(SUM(ia.portion), 0) AS portion,
+        COALESCE(SUM(ia.portion * i.min_return), 0) AS minReturn,
+        COALESCE(SUM(ia.portion * i.max_return), 0) AS maxReturn
+       FROM item_allocation ia
+       JOIN categories c ON c.id = ia.category_id
+       JOIN items i ON i.id = ia.item_id
+       WHERE ia.portfolio_id = ?
+       GROUP BY c.id, c.code, c.name, c.description
+       ORDER BY c.id ASC`,
+      [portfolioId],
+    );
+
+    return rows.map((row) => ({
+      ...mapCategory(row),
+      portion: Number(row.portion ?? 0),
+      minReturn: Number(row.minReturn ?? 0),
+      maxReturn: Number(row.maxReturn ?? 0),
+    }));
+  },
+
   getPreset: async (targetReturnPercent) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
@@ -177,6 +204,58 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     );
 
     return rows.map(mapPreset);
+  },
+
+  getItemsInPreset: async (presetCode) => {
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT
+        i.id,
+        i.category_id AS categoryId,
+        i.name,
+        i.description,
+        i.min_return AS minReturn,
+        i.max_return AS maxReturn,
+        pia.portion
+       FROM preset_item_allocation pia
+       JOIN portfolio_presets pp ON pp.id = pia.preset_id
+       JOIN items i ON i.id = pia.item_id
+       WHERE pp.code = ?
+       ORDER BY i.category_id ASC, i.id ASC`,
+      [presetCode],
+    );
+
+    return rows.map((row) => ({
+      ...mapItem(row),
+      portion: Number(row.portion ?? 0),
+    }));
+  },
+
+  getCategoriesInPreset: async (presetCode) => {
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT
+        c.id,
+        c.code,
+        c.name,
+        c.description,
+        COALESCE(SUM(pia.portion), 0) AS portion,
+        COALESCE(SUM(pia.portion * i.min_return), 0) AS minReturn,
+        COALESCE(SUM(pia.portion * i.max_return), 0) AS maxReturn
+       FROM preset_item_allocation pia
+       JOIN portfolio_presets pp ON pp.id = pia.preset_id
+       JOIN categories c ON c.id = pia.category_id
+       JOIN items i ON i.id = pia.item_id
+       WHERE pp.code = ?
+       GROUP BY c.id, c.code, c.name, c.description
+       ORDER BY c.id ASC`,
+      [presetCode],
+    );
+
+    return rows.map((row) => ({
+      ...mapCategory(row),
+      portion: Number(row.portion ?? 0),
+      minReturn: Number(row.minReturn ?? 0),
+      maxReturn: Number(row.maxReturn ?? 0),
+    }));
   },
 
   createFromPreset: async (req) => {
@@ -203,6 +282,21 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       );
       const portfolioId = portfolioResult.insertId;
       // 프로젝트-포트폴리오 연결
+      const [[versionRow]] = await conn.execute<RowDataPacket[]>(
+        `SELECT COALESCE(MAX(version), 0) + 1 AS nextVersion
+         FROM project_portfolios
+         WHERE project_id = ?`,
+        [req.projectId],
+      );
+      const nextVersion = Number(versionRow.nextVersion);
+
+      await conn.execute(
+        `UPDATE project_portfolios
+         SET is_active = FALSE
+         WHERE project_id = ?`,
+        [req.projectId],
+      );
+
       await conn.execute(
         `INSERT INTO project_portfolios (
           project_id,
@@ -210,7 +304,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
           version,
           is_active
         ) VALUES (?, ?, ?, TRUE)`,
-        [req.projectId, portfolioId],
+        [req.projectId, portfolioId, nextVersion],
       );
       // 프리셋 아이템 할당을 포트폴리오 아이템 할당으로 복사
       await conn.execute(

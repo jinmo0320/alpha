@@ -28,11 +28,47 @@ export type PortfolioRepository = {
   ) => Promise<Portfolio.Entity.Item[]>;
 
   /**
+   * 포트폴리오에 포함된 카테고리 조회
+   * @param portfolioId 포트폴리오 ID
+   */
+  getCategoriesInPortfolio: (
+    portfolioId: number,
+  ) => Promise<
+    (Category.Entity & {
+      portion: number;
+      minReturn: number;
+      maxReturn: number;
+    })[]
+  >;
+
+  /**
    * 프리셋 조회
    * @param targetReturnPercent 목표 수익률
    * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
    */
   getPreset(targetReturnPercent: number): Promise<Preset.Entity[]>;
+
+  /**
+   * 프리셋에 포함된 아이템 조회
+   * @param presetCode 프리셋 코드
+   */
+  getItemsInPreset: (
+    presetCode: string,
+  ) => Promise<(Item.Entity & { portion: number })[]>;
+
+  /**
+   * 프리셋에 포함된 카테고리 조회
+   * @param presetCode 프리셋 코드
+   */
+  getCategoriesInPreset: (
+    presetCode: string,
+  ) => Promise<
+    (Category.Entity & {
+      portion: number;
+      minReturn: number;
+      maxReturn: number;
+    })[]
+  >;
 
   /**
    * 프리셋 기반으로 새로운 포트폴리오 생성

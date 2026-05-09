@@ -1,5 +1,3 @@
-import exp from "constants";
-import { UUID } from "crypto";
 import { Category } from "./category.model";
 import { Item } from "./item.model";
 
@@ -24,12 +22,12 @@ export namespace Portfolio {
 
   export namespace Res {
     export type Root = Entity & {
-      categories: Category.Entity & {
+      categories: (Category.Entity & {
         portion: number;
         minReturn: number;
         maxReturn: number;
-        items: Entity.Item;
-      };
+        items: Entity.Item[];
+      })[];
       isActive: boolean;
     };
   }
@@ -64,14 +62,14 @@ export namespace Preset {
 
   export namespace Res {
     export type Root = Entity & {
-      categories: Category.Entity & {
+      categories: (Category.Entity & {
         portion: number;
         minReturn: number;
         maxReturn: number;
-        items: Item.Entity & {
+        items: (Item.Entity & {
           portion: number;
-        };
-      };
+        })[];
+      })[];
     };
   }
 }

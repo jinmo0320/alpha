@@ -14,8 +14,8 @@ export namespace Project {
   export namespace Res {
     export type Abstract = Entity;
     export type Detail = Entity & {
-      portfolio: Portfolio.Res.Root;
-      plan: Plan.Res.Root;
+      portfolio: Portfolio.Res.Root | null;
+      plan: Plan.Res.Root | null;
     };
   }
 
