@@ -43,7 +43,7 @@ export namespace Portfolio {
         portion: number;
         alias?: string;
         aliasDescription?: string;
-      };
+      }[];
     };
   }
 }

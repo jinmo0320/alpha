@@ -49,10 +49,25 @@ export const createPlanRepository = (): PlanRepository => ({
       );
 
       const planId = result.insertId;
+      const [[versionRow]] = await conn.execute<RowDataPacket[]>(
+        `SELECT COALESCE(MAX(version), 0) + 1 AS nextVersion
+         FROM project_plans
+         WHERE project_id = ?`,
+        [projectId],
+      );
+      const nextVersion = Number(versionRow.nextVersion);
+
       await conn.execute(
-        `INSERT INTO project_plans (project_id, plan_id, is_active)
-         VALUES (?, ?, TRUE)`,
-        [projectId, planId],
+        `UPDATE project_plans
+         SET is_active = FALSE
+         WHERE project_id = ?`,
+        [projectId],
+      );
+
+      await conn.execute(
+        `INSERT INTO project_plans (project_id, plan_id, version, is_active)
+         VALUES (?, ?, ?, TRUE)`,
+        [projectId, planId, nextVersion],
       );
 
       await conn.commit();
@@ -81,6 +96,7 @@ export const createPlanRepository = (): PlanRepository => ({
        FROM plans p
        JOIN project_plans pp ON p.id = pp.plan_id
        WHERE pp.project_id = ? AND pp.is_active = TRUE
+       ORDER BY pp.version DESC
        LIMIT 1`,
       [projectId],
     );

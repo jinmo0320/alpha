@@ -2,7 +2,7 @@ import { Plan } from "src/application/model/plan.model";
 
 export type PlanRepository = {
   /**
-   * create a plan with MTrF data
+   * create a new plan with MTrF data and version update
    * @param req project id and MTrF data
    */
   createPlan: (req: Plan.Req.Create) => Promise<void>;
