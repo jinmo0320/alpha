@@ -11,8 +11,8 @@ const mapPortfolio = (row: RowDataPacket): Portfolio.Entity => ({
   id: Number(row.id),
   name: row.name,
   status: row.status,
-  minReturn: Number(row.minReturn ?? 0),
-  maxReturn: Number(row.maxReturn ?? 0),
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
   createdAt: new Date(row.createdAt),
   updatedAt: new Date(row.updatedAt),
 });
@@ -22,8 +22,8 @@ const mapPreset = (row: RowDataPacket): Preset.Entity => ({
   name: row.name,
   description: row.description ?? "",
   targetReturnPercent: Number(row.targetReturnPercent),
-  minReturn: Number(row.minReturn ?? 0),
-  maxReturn: Number(row.maxReturn ?? 0),
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
 });
 
 const mapCategory = (row: RowDataPacket): Category.Entity => ({
@@ -38,8 +38,8 @@ const mapItem = (row: RowDataPacket): Item.Entity => ({
   categoryId: Number(row.categoryId),
   name: row.name,
   description: row.description ?? "",
-  minReturn: Number(row.minReturn ?? 0),
-  maxReturn: Number(row.maxReturn ?? 0),
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
 });
 
 const getPortfolioById = async (
@@ -128,6 +128,38 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     );
 
     return rows.length > 0 ? mapPortfolio(rows[0]) : null;
+  },
+
+  getItemsInPortfolio: async (portfolioId) => {
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT
+        i.id,
+        ia.category_id AS categoryId,
+        i.name,
+        i.description,
+        i.min_return AS minReturn,
+        i.max_return AS maxReturn,
+        ia.portion,
+        COALESCE(ia.alias, i.name) AS alias,
+        COALESCE(ia.alias_description, i.description) AS aliasDescription
+       FROM item_allocation ia
+       JOIN items i ON i.id = ia.item_id
+       WHERE ia.portfolio_id = ?
+       ORDER BY ia.category_id ASC, ia.item_id ASC`,
+      [portfolioId],
+    );
+
+    return rows.map((row) => ({
+      id: Number(row.id),
+      categoryId: Number(row.categoryId),
+      name: row.name,
+      description: row.description ?? "",
+      minReturn: Number(row.minReturn),
+      maxReturn: Number(row.maxReturn),
+      portion: Number(row.portion ?? 0),
+      alias: row.alias,
+      aliasDescription: row.aliasDescription ?? "",
+    }));
   },
 
   getPreset: async (targetReturnPercent) => {

@@ -19,6 +19,15 @@ export type PortfolioRepository = {
   get: (projectId: number) => Promise<Portfolio.Entity | null>;
 
   /**
+   * 포트폴리오 아이템 조회
+   * @param portfolioId 포트폴리오 ID
+   * @returns 아이템 리스트
+   */
+  getItemsInPortfolio: (
+    portfolioId: number,
+  ) => Promise<Portfolio.Entity.Item[]>;
+
+  /**
    * 프리셋 조회
    * @param targetReturnPercent 목표 수익률
    * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
