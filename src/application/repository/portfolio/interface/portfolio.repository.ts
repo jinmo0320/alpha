@@ -1,7 +1,6 @@
-import { UUID } from "crypto";
 import { Category } from "src/application/model/category.model";
 import { Item } from "src/application/model/item.model";
-import { Portfolio, Preset } from "src/application/model/portfolio.model";
+import { Portfolio } from "src/application/model/portfolio.model";
 
 export type PortfolioRepository = {
   /**
@@ -19,7 +18,6 @@ export type PortfolioRepository = {
   get: (projectId: number) => Promise<Portfolio.Entity | null>;
 
   /**
-<<<<<<< HEAD
    * 포트폴리오 아이템 조회
    * @param portfolioId 포트폴리오 ID
    * @returns 아이템 리스트
@@ -29,49 +27,18 @@ export type PortfolioRepository = {
   ) => Promise<Portfolio.Entity.Item[]>;
 
   /**
-   * 포트폴리오에 포함된 카테고리 조회
-   * @param portfolioId 포트폴리오 ID
-   */
-  getCategoriesInPortfolio: (
-    portfolioId: number,
-  ) => Promise<
-    (Category.Entity & {
-      portion: number;
-      minReturn: number;
-      maxReturn: number;
-    })[]
-  >;
-
-  /**
-=======
->>>>>>> parent of 129b1f1 (add getItemsInPortfolio)
    * 프리셋 조회
    * @param targetReturnPercent 목표 수익률
    * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
    */
-  getPreset(targetReturnPercent: number): Promise<Preset.Entity[]>;
+  getPreset(targetReturnPercent: number): Promise<Portfolio.Entity.Preset[]>;
 
   /**
-   * 프리셋에 포함된 아이템 조회
+   * 프리셋 아이템 조회
    * @param presetCode 프리셋 코드
+   * @returns 아이템 리스트
    */
-  getItemsInPreset: (
-    presetCode: string,
-  ) => Promise<(Item.Entity & { portion: number })[]>;
-
-  /**
-   * 프리셋에 포함된 카테고리 조회
-   * @param presetCode 프리셋 코드
-   */
-  getCategoriesInPreset: (
-    presetCode: string,
-  ) => Promise<
-    (Category.Entity & {
-      portion: number;
-      minReturn: number;
-      maxReturn: number;
-    })[]
-  >;
+  getItemsInPreset: (presetCode: string) => Promise<Portfolio.Entity.Item[]>;
 
   /**
    * 프리셋 기반으로 새로운 포트폴리오 생성

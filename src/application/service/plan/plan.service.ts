@@ -5,11 +5,7 @@ export type PlanService = {
    * creates a new plan
    * @param mtrf MTrF simulation request
    */
-<<<<<<< HEAD
   createPlan: (mtrf: Plan.Req.Create) => Promise<Plan.Res.Root>;
-=======
-  createPlan: (mtrf: Plan.Req.Simulation) => Promise<void>;
->>>>>>> parent of 129b1f1 (add getItemsInPortfolio)
 
   /**
    * gets a plan by project id

@@ -1,7 +1,6 @@
-import { UUID } from "crypto";
 import { Category } from "src/application/model/category.model";
 import { Item } from "src/application/model/item.model";
-import { Portfolio, Preset } from "src/application/model/portfolio.model";
+import { Portfolio } from "src/application/model/portfolio.model";
 
 export type PortfolioService = {
   /**
@@ -16,7 +15,7 @@ export type PortfolioService = {
    * @param projectId project id
    * @returns array of recommended portfolios
    */
-  recommendPresets: (projectId: number) => Promise<Preset.Res.Root[]>;
+  recommendPresets: (projectId: number) => Promise<Portfolio.Res.Preset[]>;
 
   /**
    * creates a portfolio for the user based on the preset code

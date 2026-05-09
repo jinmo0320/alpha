@@ -12,24 +12,41 @@ export namespace Portfolio {
     updatedAt: Date;
   };
 
+  export namespace Entity {
+    export type Preset = {
+      code: string;
+      name: string;
+      description: string;
+      targetReturnPercent: number;
+      minReturn: number;
+      maxReturn: number;
+    };
+
+    export type Item = Item.Entity & {
+      portion: number;
+      alias: string;
+      aliasDescription: string;
+    };
+  }
+
   export namespace Res {
     export type Root = Entity & {
       categories: (Category.Entity & {
         portion: number;
         minReturn: number;
         maxReturn: number;
-<<<<<<< HEAD
         items: Entity.Item[];
       })[];
-=======
-        items: Item.Entity & {
-          portion: number;
-          alias: string;
-          aliasDescription: string;
-        };
-      };
->>>>>>> parent of 129b1f1 (add getItemsInPortfolio)
       isActive: boolean;
+    };
+
+    export type Preset = Entity.Preset & {
+      categories: (Category.Entity & {
+        portion: number;
+        minReturn: number;
+        maxReturn: number;
+        items: Entity.Item[];
+      })[];
     };
   }
 
@@ -47,30 +64,6 @@ export namespace Portfolio {
         alias?: string;
         aliasDescription?: string;
       }[];
-    };
-  }
-}
-
-export namespace Preset {
-  export type Entity = {
-    code: string;
-    name: string;
-    description: string;
-    targetReturnPercent: number;
-    minReturn: number;
-    maxReturn: number;
-  };
-
-  export namespace Res {
-    export type Root = Entity & {
-      categories: (Category.Entity & {
-        portion: number;
-        minReturn: number;
-        maxReturn: number;
-        items: (Item.Entity & {
-          portion: number;
-        })[];
-      })[];
     };
   }
 }

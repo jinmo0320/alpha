@@ -1,7 +1,7 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Category } from "src/application/model/category.model";
 import { Item } from "src/application/model/item.model";
-import { Portfolio, Preset } from "src/application/model/portfolio.model";
+import { Portfolio } from "src/application/model/portfolio.model";
 import db from "src/externals/database/db";
 import { PortfolioRepository } from "../interface/portfolio.repository";
 
@@ -11,19 +11,19 @@ const mapPortfolio = (row: RowDataPacket): Portfolio.Entity => ({
   id: Number(row.id),
   name: row.name,
   status: row.status,
-  minReturn: Number(row.minReturn ?? 0),
-  maxReturn: Number(row.maxReturn ?? 0),
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
   createdAt: new Date(row.createdAt),
   updatedAt: new Date(row.updatedAt),
 });
 
-const mapPreset = (row: RowDataPacket): Preset.Entity => ({
+const mapPreset = (row: RowDataPacket): Portfolio.Entity.Preset => ({
   code: row.code,
   name: row.name,
   description: row.description ?? "",
   targetReturnPercent: Number(row.targetReturnPercent),
-  minReturn: Number(row.minReturn ?? 0),
-  maxReturn: Number(row.maxReturn ?? 0),
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
 });
 
 const mapCategory = (row: RowDataPacket): Category.Entity => ({
@@ -38,8 +38,20 @@ const mapItem = (row: RowDataPacket): Item.Entity => ({
   categoryId: Number(row.categoryId),
   name: row.name,
   description: row.description ?? "",
-  minReturn: Number(row.minReturn ?? 0),
-  maxReturn: Number(row.maxReturn ?? 0),
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
+});
+
+const mapPortfolioItem = (row: RowDataPacket): Portfolio.Entity.Item => ({
+  id: Number(row.id),
+  categoryId: Number(row.categoryId),
+  name: row.name,
+  description: row.description ?? "",
+  minReturn: Number(row.minReturn),
+  maxReturn: Number(row.maxReturn),
+  portion: Number(row.portion ?? 0),
+  alias: row.alias,
+  aliasDescription: row.aliasDescription ?? "",
 });
 
 const getPortfolioById = async (
@@ -130,7 +142,6 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     return rows.length > 0 ? mapPortfolio(rows[0]) : null;
   },
 
-<<<<<<< HEAD
   getItemsInPortfolio: async (portfolioId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
@@ -150,48 +161,9 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       [portfolioId],
     );
 
-    return rows.map((row) => ({
-      id: Number(row.id),
-      categoryId: Number(row.categoryId),
-      name: row.name,
-      description: row.description ?? "",
-      minReturn: Number(row.minReturn),
-      maxReturn: Number(row.maxReturn),
-      portion: Number(row.portion ?? 0),
-      alias: row.alias,
-      aliasDescription: row.aliasDescription ?? "",
-    }));
+    return rows.map(mapPortfolioItem);
   },
 
-  getCategoriesInPortfolio: async (portfolioId) => {
-    const [rows] = await db.execute<RowDataPacket[]>(
-      `SELECT
-        c.id,
-        c.code,
-        c.name,
-        c.description,
-        COALESCE(SUM(ia.portion), 0) AS portion,
-        COALESCE(SUM(ia.portion * i.min_return), 0) AS minReturn,
-        COALESCE(SUM(ia.portion * i.max_return), 0) AS maxReturn
-       FROM item_allocation ia
-       JOIN categories c ON c.id = ia.category_id
-       JOIN items i ON i.id = ia.item_id
-       WHERE ia.portfolio_id = ?
-       GROUP BY c.id, c.code, c.name, c.description
-       ORDER BY c.id ASC`,
-      [portfolioId],
-    );
-
-    return rows.map((row) => ({
-      ...mapCategory(row),
-      portion: Number(row.portion ?? 0),
-      minReturn: Number(row.minReturn ?? 0),
-      maxReturn: Number(row.maxReturn ?? 0),
-    }));
-  },
-
-=======
->>>>>>> parent of 129b1f1 (add getItemsInPortfolio)
   getPreset: async (targetReturnPercent) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
@@ -213,52 +185,23 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
         i.id,
-        i.category_id AS categoryId,
+        pia.category_id AS categoryId,
         i.name,
         i.description,
         i.min_return AS minReturn,
         i.max_return AS maxReturn,
-        pia.portion
+        pia.portion,
+        i.name AS alias,
+        i.description AS aliasDescription
        FROM preset_item_allocation pia
        JOIN portfolio_presets pp ON pp.id = pia.preset_id
        JOIN items i ON i.id = pia.item_id
        WHERE pp.code = ?
-       ORDER BY i.category_id ASC, i.id ASC`,
+       ORDER BY pia.category_id ASC, pia.item_id ASC`,
       [presetCode],
     );
 
-    return rows.map((row) => ({
-      ...mapItem(row),
-      portion: Number(row.portion ?? 0),
-    }));
-  },
-
-  getCategoriesInPreset: async (presetCode) => {
-    const [rows] = await db.execute<RowDataPacket[]>(
-      `SELECT
-        c.id,
-        c.code,
-        c.name,
-        c.description,
-        COALESCE(SUM(pia.portion), 0) AS portion,
-        COALESCE(SUM(pia.portion * i.min_return), 0) AS minReturn,
-        COALESCE(SUM(pia.portion * i.max_return), 0) AS maxReturn
-       FROM preset_item_allocation pia
-       JOIN portfolio_presets pp ON pp.id = pia.preset_id
-       JOIN categories c ON c.id = pia.category_id
-       JOIN items i ON i.id = pia.item_id
-       WHERE pp.code = ?
-       GROUP BY c.id, c.code, c.name, c.description
-       ORDER BY c.id ASC`,
-      [presetCode],
-    );
-
-    return rows.map((row) => ({
-      ...mapCategory(row),
-      portion: Number(row.portion ?? 0),
-      minReturn: Number(row.minReturn ?? 0),
-      maxReturn: Number(row.maxReturn ?? 0),
-    }));
+    return rows.map(mapPortfolioItem);
   },
 
   createFromPreset: async (req) => {
