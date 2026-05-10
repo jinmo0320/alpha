@@ -4,6 +4,8 @@ export type PlanService = {
   /**
    * creates a new plan
    * @param mtrf MTrF simulation request
+   * @errors INVALID_INVESTMENT_PLAN
+   * @returns created plan
    */
   createPlan: (mtrf: Plan.Req.Create) => Promise<Plan.Res.Root>;
 

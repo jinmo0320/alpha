@@ -12,10 +12,7 @@ const service = createPlanService({
 
 const ctrl = planController(service);
 
-// Payment schedule generation is intentionally paused until payment flow is rebuilt.
 router.get("/", authenticate, ctrl.getPlan);
 router.post("/", authenticate, ctrl.createPlan);
-router.put("/", authenticate, ctrl.updatePlan);
-router.patch("/clear", authenticate, ctrl.clearPlan);
 
 export default router;

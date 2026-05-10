@@ -5,7 +5,7 @@ export type PlanRepository = {
    * create a new plan with MTrF data and version update
    * @param req project id and MTrF data
    */
-  createPlan: (req: Plan.Req.Create) => Promise<void>;
+  createPlan: (req: Plan.Req.Create) => Promise<Plan.Entity>;
   /**
    * get the plan of a project
    * @param projectId project id

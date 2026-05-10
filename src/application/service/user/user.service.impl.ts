@@ -56,6 +56,12 @@ export const createUserService = ({
     }
     if (score !== null) {
       const riskType = determineRiskType(score);
+      if (!riskType) {
+        throw new DomainError(
+          ErrorCodes.INV_PROFILE.INVALID_RISK_SCORE,
+          "The provided risk score is invalid.",
+        );
+      }
       await userRepository.setRiskType(userId, riskType);
     } else {
       await userRepository.setRiskType(userId, null);

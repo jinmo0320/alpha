@@ -23,6 +23,7 @@ export type UserService = {
    * 투자 성향 설정 함수
    * @param userId 투자 성향을 설정할 사용자의 UUID
    * @param score 투자 성향 점수 또는 null
+   * @errors USER_NOT_FOUND, INVALID_RISK_SCORE
    */
   setRiskType: (userId: UUID, score: number | null) => Promise<void>;
 };

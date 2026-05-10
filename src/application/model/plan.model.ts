@@ -1,4 +1,7 @@
+import { RowDataPacket } from "mysql2";
+
 export namespace Plan {
+  // DB Entity
   export type Entity = {
     version: number;
 
@@ -17,6 +20,7 @@ export namespace Plan {
     isActive: boolean;
   };
 
+  // DTO Response and Request
   export namespace Res {
     export type Root = Entity;
   }
@@ -35,5 +39,26 @@ export namespace Plan {
       startDate: Date;
       paymentDay: number;
     };
+  }
+
+  // Mapping Functions
+  export namespace Map {
+    export const toEntity = (row: RowDataPacket): Entity => ({
+      version: Number(row.version),
+      initialAmount: Number(row.initialAmount),
+      monthlyAmount: Number(row.monthlyAmount),
+      period: Number(row.period),
+      expectedReturn: Number(row.expectedReturn),
+      targetAmount: Number(row.targetAmount),
+      startDate: row.startDate === null ? null : new Date(row.startDate),
+      paymentDay: row.paymentDay === null ? null : Number(row.paymentDay),
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+      isActive: Boolean(row.isActive),
+    });
+
+    export const toRoot = (entity: Entity): Res.Root => ({
+      ...entity,
+    });
   }
 }

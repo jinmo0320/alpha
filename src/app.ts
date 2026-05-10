@@ -45,9 +45,9 @@ const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/users/me", userRoutes);
 router.use("/surveys", surveyRoutes);
-router.use("/users/me/plan", planRoutes);
-router.use("/users/me/portfolio", portfolioRoutes);
-router.use("/users/me/payment", paymentRoutes);
+router.use("/projects/:projectId/plan", planRoutes);
+router.use("/projects/:projectId/portfolio", portfolioRoutes);
+router.use("/projects/:projectId/payment", paymentRoutes);
 router.use("/projects", projectRoutes);
 
 app.use("/api/v1", router);
