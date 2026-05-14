@@ -1,11 +1,12 @@
 import { Category } from "./category.model";
 import { Item } from "./item.model";
+import { RowDataPacket } from "mysql2";
 
 export namespace Portfolio {
+  // DB Entity
   export type Entity = {
     id: number;
     name: string;
-    status: "PENDING" | "STABLE" | "DISABLED";
     minReturn: number;
     maxReturn: number;
     createdAt: Date;
@@ -16,7 +17,7 @@ export namespace Portfolio {
     export type Preset = {
       code: string;
       name: string;
-      description: string;
+      description: string | null;
       targetReturnPercent: number;
       minReturn: number;
       maxReturn: number;
@@ -24,11 +25,12 @@ export namespace Portfolio {
 
     export type Item = Item.Entity & {
       portion: number;
-      alias: string;
-      aliasDescription: string;
+      alias?: string | null;
+      aliasDescription?: string | null;
     };
   }
 
+  // DTO Response and Request
   export namespace Res {
     export type Root = Entity & {
       categories: (Category.Entity & {
@@ -37,7 +39,7 @@ export namespace Portfolio {
         maxReturn: number;
         items: Entity.Item[];
       })[];
-      isActive: boolean;
+      status: Status;
     };
 
     export type Preset = Entity.Preset & {
@@ -48,6 +50,12 @@ export namespace Portfolio {
         items: Entity.Item[];
       })[];
     };
+
+    export enum Status {
+      PENDING = "PENDING", // 미완성
+      STABLE = "STABLE", // 완성
+      OVER_ALLOCATED = "OVER_ALLOCATED", // 오류
+    }
   }
 
   export namespace Req {
@@ -65,5 +73,49 @@ export namespace Portfolio {
         aliasDescription?: string;
       }[];
     };
+  }
+
+  // Mapping Functions
+  export namespace Map {
+    export const toEntity = (row: RowDataPacket): Entity => ({
+      id: Number(row.id),
+      name: row.name,
+      minReturn: Number(row.minReturn),
+      maxReturn: Number(row.maxReturn),
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    });
+
+    export const toPresetEntity = (row: RowDataPacket): Entity.Preset => ({
+      code: row.code,
+      name: row.name,
+      description: row.description ?? null,
+      targetReturnPercent: Number(row.targetReturnPercent),
+      minReturn: Number(row.minReturn),
+      maxReturn: Number(row.maxReturn),
+    });
+
+    export const toItemEntity = (row: RowDataPacket): Entity.Item =>
+      row.alias
+        ? {
+            id: Number(row.id),
+            categoryId: Number(row.categoryId),
+            name: row.name,
+            description: row.description ?? null,
+            minReturn: Number(row.minReturn),
+            maxReturn: Number(row.maxReturn),
+            portion: Number(row.portion),
+            alias: row.alias ?? null,
+            aliasDescription: row.aliasDescription ?? null,
+          }
+        : {
+            id: Number(row.id),
+            categoryId: Number(row.categoryId),
+            name: row.name,
+            description: row.description ?? null,
+            minReturn: Number(row.minReturn),
+            maxReturn: Number(row.maxReturn),
+            portion: Number(row.portion),
+          };
   }
 }

@@ -58,7 +58,7 @@ export const createUserService = ({
       const riskType = determineRiskType(score);
       if (!riskType) {
         throw new DomainError(
-          ErrorCodes.INV_PROFILE.INVALID_RISK_SCORE,
+          ErrorCodes.USER.INVALID_RISK_SCORE,
           "The provided risk score is invalid.",
         );
       }

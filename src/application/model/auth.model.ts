@@ -1,43 +1,40 @@
 import { User } from "./user.model";
 
-export type RegisterReqDto = {
-  email: string;
-  password: string;
-};
+export namespace Auth {
+  // DTO Response and Requse
+  export namespace Res {
+    export type Success = {
+      accessToken: string;
+      refreshToken: string;
+      user: User.Res.Root;
+    };
 
-export type RegisterResDto = {
-  accessToken: string;
-  refreshToken: string;
-  user: User.Info;
-};
+    export type SendCode = {
+      email: string;
+      createdAt: Date;
+      expiredAt: Date;
+    };
 
-export type LoginReqDto = {
-  email: string;
-  password: string;
-};
+    export type Refresh = {
+      accessToken: string;
+      refreshToken: string;
+    };
+  }
 
-export type LoginResDto = {
-  accessToken: string;
-  refreshToken: string;
-  user: User.Info;
-};
+  export namespace Req {
+    export type Sign = {
+      email: string;
+      password: string;
+    };
 
-export type SendCodeResDto = {
-  createdAt: string;
-  expiredAt: string;
-};
+    export type Verify = {
+      email: string;
+      code: string;
+    };
 
-export type CheckCodeReqDto = {
-  email: string;
-  code: string;
-};
-
-export type ResetPasswordReqDto = {
-  email: string;
-  newPassword: string;
-};
-
-export type RefreshTokenResDto = {
-  accessToken: string;
-  refreshToken: string;
-};
+    export type ResetPassword = {
+      email: string;
+      newPassword: string;
+    };
+  }
+}

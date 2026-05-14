@@ -25,22 +25,24 @@ export type PortfolioService = {
   createFromPreset: (req: Portfolio.Req.Create) => Promise<Portfolio.Res.Root>;
 
   /**
-   * sets portfolio items with portion
+   * initializes portfolio items with portion
    * @param req portfolio id and items with portion
    * @return full portfolio spec
    */
-  setPortfolio: (req: Portfolio.Req.Set) => Promise<Portfolio.Res.Root>;
+  initPortfolio: (req: Portfolio.Req.Set) => Promise<Portfolio.Res.Root>;
 
   /**
    * gets available categories for the portfolio
-   * @param portfolioId portfolio id
+   * @param req portfolio and user id
    * @returns available categories
    */
-  getAvailableCategories: (portfolioId: number) => Promise<Category.Res.Root[]>;
+  getAvailableCategories: (
+    req: Category.Req.Available,
+  ) => Promise<Category.Res.Root[]>;
 
   /**
    * gets available items for the category in the portfolio
-   * @param req portfolio id and category id
+   * @param req portfolio id and category id, user id
    * @returns available items
    */
   getAvailableItems: (req: Item.Req.Available) => Promise<Item.Res.Root[]>;

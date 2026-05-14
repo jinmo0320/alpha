@@ -20,7 +20,7 @@ export type PortfolioRepository = {
   /**
    * 포트폴리오 아이템 조회
    * @param portfolioId 포트폴리오 ID
-   * @returns 아이템 리스트
+   * @returns 아이템 리스트 (portion & alias 포함)
    */
   getItemsInPortfolio: (
     portfolioId: number,
@@ -31,12 +31,12 @@ export type PortfolioRepository = {
    * @param targetReturnPercent 목표 수익률
    * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
    */
-  getPreset(targetReturnPercent: number): Promise<Portfolio.Entity.Preset[]>;
+  getPresets(targetReturnPercent: number): Promise<Portfolio.Entity.Preset[]>;
 
   /**
    * 프리셋 아이템 조회
    * @param presetCode 프리셋 코드
-   * @returns 아이템 리스트
+   * @returns 아이템 리스트 (portion 포함)
    */
   getItemsInPreset: (presetCode: string) => Promise<Portfolio.Entity.Item[]>;
 
@@ -47,22 +47,25 @@ export type PortfolioRepository = {
   createFromPreset: (req: Portfolio.Req.Create) => Promise<Portfolio.Entity>;
 
   /**
-   * 포트폴리오 아이템 설정
+   * 포트폴리오 아이템 초기화
    * @param req 포트폴리오 ID, 아이템 목록과 각 아이템의 비중
-   * @returns
+   * @return 설정된 포트폴리오 정보
    */
-  set: (req: Portfolio.Req.Set) => Promise<Portfolio.Entity>;
+  init: (req: Portfolio.Req.Set) => Promise<Portfolio.Entity>;
 
   /**
    * 포트폴리오에 추가 가능한 카테고리 목록 가져오기
-   * @param portfolioId 포트폴리오 ID
+   * @param req 사용자 ID, 포트폴리오 ID
+   * @return 추가 가능한 카테고리 리스트
    */
-  getAvailableCategories: (portfolioId: number) => Promise<Category.Entity[]>;
+  getAvailableCategories: (
+    req: Category.Req.Available,
+  ) => Promise<Category.Entity[]>;
 
   /**
    * 포트폴리오에 추가 가능한 아이템 목록 가져오기
-   * @param userId 사용자 ID
-   * @param portfolioId 포트폴리오 ID
+   * @param req 사용자 ID, 포트폴리오 ID, 카테고리 ID
+   * @return 추가 가능한 아이템 리스트
    */
   getAvailableItems: (req: Item.Req.Available) => Promise<Item.Entity[]>;
 };

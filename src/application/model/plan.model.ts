@@ -16,8 +16,6 @@ export namespace Plan {
 
     createdAt: Date;
     updatedAt: Date;
-
-    isActive: boolean;
   };
 
   // DTO Response and Request
@@ -54,7 +52,6 @@ export namespace Plan {
       paymentDay: row.paymentDay === null ? null : Number(row.paymentDay),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
-      isActive: Boolean(row.isActive),
     });
 
     export const toRoot = (entity: Entity): Res.Root => ({

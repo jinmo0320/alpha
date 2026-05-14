@@ -100,6 +100,7 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
 
   getAvailableItems: async (req: Request, res: Response) => {
     const list = await portfolioService.getAvailableItems({
+      portfolioId: req.user!.portfolioId!,
       categoryId: Number(req.params.categoryId),
     });
     res.status(200).json({

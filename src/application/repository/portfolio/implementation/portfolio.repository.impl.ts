@@ -7,53 +7,6 @@ import { PortfolioRepository } from "../interface/portfolio.repository";
 
 type Executor = Pick<PoolConnection, "execute">;
 
-const mapPortfolio = (row: RowDataPacket): Portfolio.Entity => ({
-  id: Number(row.id),
-  name: row.name,
-  status: row.status,
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
-  createdAt: new Date(row.createdAt),
-  updatedAt: new Date(row.updatedAt),
-});
-
-const mapPreset = (row: RowDataPacket): Portfolio.Entity.Preset => ({
-  code: row.code,
-  name: row.name,
-  description: row.description ?? "",
-  targetReturnPercent: Number(row.targetReturnPercent),
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
-});
-
-const mapCategory = (row: RowDataPacket): Category.Entity => ({
-  id: Number(row.id),
-  code: row.code,
-  name: row.name,
-  description: row.description ?? "",
-});
-
-const mapItem = (row: RowDataPacket): Item.Entity => ({
-  id: Number(row.id),
-  categoryId: Number(row.categoryId),
-  name: row.name,
-  description: row.description ?? "",
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
-});
-
-const mapPortfolioItem = (row: RowDataPacket): Portfolio.Entity.Item => ({
-  id: Number(row.id),
-  categoryId: Number(row.categoryId),
-  name: row.name,
-  description: row.description ?? "",
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
-  portion: Number(row.portion ?? 0),
-  alias: row.alias,
-  aliasDescription: row.aliasDescription ?? "",
-});
-
 const getPortfolioById = async (
   executor: Executor,
   portfolioId: number,
@@ -62,7 +15,6 @@ const getPortfolioById = async (
     `SELECT
       id,
       name,
-      status,
       min_return AS minReturn,
       max_return AS maxReturn,
       created_at AS createdAt,
@@ -73,7 +25,7 @@ const getPortfolioById = async (
     [portfolioId],
   );
 
-  return rows.length > 0 ? mapPortfolio(rows[0]) : null;
+  return rows.length > 0 ? Portfolio.Map.toEntity(rows[0]) : null;
 };
 
 const recalculatePortfolioReturn = async (
@@ -106,7 +58,6 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       `SELECT
         p.id,
         p.name,
-        p.status,
         p.min_return AS minReturn,
         p.max_return AS maxReturn,
         p.created_at AS createdAt,
@@ -118,7 +69,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       [projectId],
     );
 
-    return rows.map(mapPortfolio);
+    return rows.map(Portfolio.Map.toEntity);
   },
 
   get: async (projectId) => {
@@ -126,20 +77,19 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       `SELECT
         p.id,
         p.name,
-        p.status,
         p.min_return AS minReturn,
         p.max_return AS maxReturn,
         p.created_at AS createdAt,
         p.updated_at AS updatedAt
        FROM portfolios p
        JOIN project_portfolios pp ON pp.portfolio_id = p.id
-       WHERE pp.project_id = ? AND pp.is_active = TRUE
+       WHERE pp.project_id = ?
        ORDER BY pp.version DESC
        LIMIT 1`,
       [projectId],
     );
 
-    return rows.length > 0 ? mapPortfolio(rows[0]) : null;
+    return rows.length > 0 ? Portfolio.Map.toEntity(rows[0]) : null;
   },
 
   getItemsInPortfolio: async (portfolioId) => {
@@ -152,8 +102,8 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
         i.min_return AS minReturn,
         i.max_return AS maxReturn,
         ia.portion,
-        COALESCE(ia.alias, i.name) AS alias,
-        COALESCE(ia.alias_description, i.description) AS aliasDescription
+        ia.alias,
+        ia.alias_description AS aliasDescription
        FROM item_allocation ia
        JOIN items i ON i.id = ia.item_id
        WHERE ia.portfolio_id = ?
@@ -161,10 +111,10 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       [portfolioId],
     );
 
-    return rows.map(mapPortfolioItem);
+    return rows.map(Portfolio.Map.toItemEntity);
   },
 
-  getPreset: async (targetReturnPercent) => {
+  getPresets: async (targetReturnPercent) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
         code,
@@ -174,11 +124,12 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
         min_return AS minReturn,
         max_return AS maxReturn
        FROM portfolio_presets
-       ORDER BY ABS(target_return_percent - ?) ASC, target_return_percent ASC`,
+       ORDER BY ABS(target_return_percent - ?) ASC, target_return_percent ASC
+       LIMIT 3`,
       [targetReturnPercent],
     );
 
-    return rows.map(mapPreset);
+    return rows.map(Portfolio.Map.toPresetEntity);
   },
 
   getItemsInPreset: async (presetCode) => {
@@ -190,9 +141,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
         i.description,
         i.min_return AS minReturn,
         i.max_return AS maxReturn,
-        pia.portion,
-        i.name AS alias,
-        i.description AS aliasDescription
+        pia.portion
        FROM preset_item_allocation pia
        JOIN portfolio_presets pp ON pp.id = pia.preset_id
        JOIN items i ON i.id = pia.item_id
@@ -201,7 +150,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       [presetCode],
     );
 
-    return rows.map(mapPortfolioItem);
+    return rows.map(Portfolio.Map.toItemEntity);
   },
 
   createFromPreset: async (req) => {
@@ -219,14 +168,16 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
         [req.presetCode],
       );
       if (presets.length === 0) throw new Error("Preset not found");
+
       // 포트폴리오 생성
       const preset = presets[0];
       const [portfolioResult] = await conn.execute<ResultSetHeader>(
-        `INSERT INTO portfolios (name, status, min_return, max_return)
-         VALUES (?, 'PENDING', ?, ?)`,
+        `INSERT INTO portfolios (name, min_return, max_return)
+         VALUES (?, ?, ?)`,
         [preset.name, preset.min_return, preset.max_return],
       );
       const portfolioId = portfolioResult.insertId;
+
       // 프로젝트-포트폴리오 연결
       const [[versionRow]] = await conn.execute<RowDataPacket[]>(
         `SELECT COALESCE(MAX(version), 0) + 1 AS nextVersion
@@ -237,37 +188,26 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       const nextVersion = Number(versionRow.nextVersion);
 
       await conn.execute(
-        `UPDATE project_portfolios
-         SET is_active = FALSE
-         WHERE project_id = ?`,
-        [req.projectId],
-      );
-
-      await conn.execute(
         `INSERT INTO project_portfolios (
           project_id,
           portfolio_id,
-          version,
-          is_active
-        ) VALUES (?, ?, ?, TRUE)`,
+          version
+        ) VALUES (?, ?, ?)`,
         [req.projectId, portfolioId, nextVersion],
       );
+
       // 프리셋 아이템 할당을 포트폴리오 아이템 할당으로 복사
       await conn.execute(
         `INSERT INTO item_allocation (
           portfolio_id,
           item_id,
           category_id,
-          alias,
-          alias_description,
           portion
         )
          SELECT
           ?,
           pia.item_id,
           pia.category_id,
-          i.name,
-          i.description,
           pia.portion
          FROM preset_item_allocation pia
          JOIN items i ON i.id = pia.item_id
@@ -288,18 +228,20 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     }
   },
 
-  set: async (req) => {
+  init: async (req) => {
     const conn = await db.getConnection();
 
     try {
       await conn.beginTransaction();
 
+      // 기존 아이템 할당 삭제
       await conn.execute(
         `DELETE FROM item_allocation
          WHERE portfolio_id = ?`,
         [req.portfolioId],
       );
 
+      // 각 item 정보를 item allocation에 삽입
       for (const item of req.items) {
         const [items] = await conn.execute<RowDataPacket[]>(
           `SELECT id, category_id, name, description
@@ -324,8 +266,8 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
             req.portfolioId,
             item.itemId,
             masterItem.category_id,
-            item.alias ?? masterItem.name,
-            item.aliasDescription ?? masterItem.description,
+            item.alias ?? null,
+            item.aliasDescription ?? null,
             item.portion,
           ],
         );
@@ -334,7 +276,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
       await recalculatePortfolioReturn(conn, req.portfolioId);
 
       const portfolio = await getPortfolioById(conn, req.portfolioId);
-      if (!portfolio) throw new Error("Portfolio not found");
+      if (!portfolio) throw new Error("Failed to initialize portfolio");
 
       await conn.commit();
       return portfolio;
@@ -346,7 +288,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     }
   },
 
-  getAvailableCategories: async (portfolioId) => {
+  getAvailableCategories: async (req) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT id, code, name, description
        FROM categories c
@@ -355,11 +297,23 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
          FROM item_allocation ia
          WHERE ia.portfolio_id = ? AND ia.category_id = c.id
        )
+       AND (
+         NOT EXISTS (
+           SELECT 1
+           FROM category_ownership co
+           WHERE co.category_id = c.id
+         )
+         OR EXISTS (
+           SELECT 1
+           FROM category_ownership co
+           WHERE co.user_id = ?
+         )
+       )
        ORDER BY id ASC`,
-      [portfolioId],
+      [req.portfolioId, req.userId],
     );
 
-    return rows.map(mapCategory);
+    return rows.map(Category.Map.toEntity);
   },
 
   getAvailableItems: async (req) => {
@@ -378,10 +332,22 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
            FROM item_allocation ia
            WHERE ia.portfolio_id = ? AND ia.item_id = i.id
          )
+         AND (
+           NOT EXISTS (
+             SELECT 1
+             FROM item_ownership io
+             WHERE io.item_id = i.id
+           )
+           OR EXISTS (
+             SELECT 1
+             FROM item_ownership io
+             WHERE io.user_id = ?
+           )
+         )
        ORDER BY i.id ASC`,
-      [req.categoryId, req.portfolioId],
+      [req.categoryId, req.portfolioId, req.userId],
     );
 
-    return rows.map(mapItem);
+    return rows.map(Item.Map.toEntity);
   },
 });

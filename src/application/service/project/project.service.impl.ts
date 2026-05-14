@@ -1,31 +1,42 @@
-import { ProjectRepository } from "src/application/repository/project/project.repository";
 import { ProjectService } from "./project.service";
-import { PortfolioRepository } from "src/application/repository/portfolio/interface/portfolio.repository";
+import { Project } from "src/application/model/project.model";
+import { ProjectDeps } from "./project.deps";
+import { DomainError } from "src/application/errors/error";
+import { ErrorCodes } from "src/application/errors/errorCodes";
 
-export const createProjectService = (
-  projectRepository: ProjectRepository,
-  portfolioRepository: PortfolioRepository,
-): ProjectService => ({
+export const createProjectService = ({
+  projectRepository,
+  userRepository,
+  portfolioService,
+  planService,
+}: ProjectDeps): ProjectService => ({
   createProject: async (info) => {
     const { userId, name } = info;
-    await projectRepository.createProject(userId, name);
+    const project = await projectRepository.create({ userId, name });
+    return Project.Map.toAbstract(project);
   },
 
   getProjectList: async (userId) => {
-    const projects = await projectRepository.getProjectList(userId);
-    return projects.map((project) => ({
-      id: project.id,
-      name: project.name,
-      status: project.status,
-      createdAt: project.created_at,
-      updatedAt: project.updated_at,
-    }));
+    const projects = await projectRepository.getAll(userId);
+    return projects.map(Project.Map.toAbstract);
   },
 
-  getProject: async (projectId) => {
-    const project = await projectRepository.getProject(projectId);
-    if (!project) return null;
+  getProject: async (userId, projectId) => {
+    const riskType = userRepository.getRiskType(userId);
 
-    return {};
+    const project = await projectRepository.get(projectId);
+    if (!project)
+      throw new DomainError(ErrorCodes.PROJECT.NOT_FOUND, "project not found.");
+
+    const portfolio = await portfolioService.getPortfolio(project.id);
+    const plan = await planService.getPlan(project.id);
+
+    const projectReturn: Project.Res.Detail = {
+      ...project,
+      portfolio,
+      plan,
+    };
+
+    return projectReturn;
   },
 });

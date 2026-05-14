@@ -1,49 +1,69 @@
 import { UUID } from "crypto";
 
 export namespace User {
-  export type RiskType =
-    | "STABLE"
-    | "STABLE_SEEK"
-    | "NEUTRAL"
-    | "ACTIVE"
-    | "AGGRESSIVE";
-
+  // DB Entity
   export type Entity = {
     id: UUID;
     email: string;
     name: string;
     tag: string;
     hashedPassword: string;
-    riskType: RiskType | null;
+    riskType: Entity.RiskType | null;
     createdAt: Date;
+    updatedAt: Date;
   };
 
-  export type RegisterInput = Pick<
-    Entity,
-    "email" | "hashedPassword" | "name" | "tag"
-  >;
+  export namespace Entity {
+    export type RiskType =
+      | "STABLE"
+      | "STABLE_SEEK"
+      | "NEUTRAL"
+      | "ACTIVE"
+      | "AGGRESSIVE";
+  }
 
-  export type Info = Pick<Entity, "id" | "email" | "name" | "tag" | "riskType">;
-  export type PasswordInfo = Pick<Entity, "id" | "email" | "hashedPassword">;
+  // DTO Response and Requset
+  export namespace Res {
+    export type Root = {
+      id: UUID;
+      email: string;
+      name: string;
+      tag: string;
+      riskType: Entity.RiskType | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+
+    export type Password = {
+      id: UUID;
+      email: string;
+      hashedPassword: string;
+    };
+  }
+
+  export namespace Req {
+    export type Create = {
+      email: string;
+      name: string;
+      tag: string;
+      password: string;
+    };
+
+    export type ChangePassword = {
+      userId: UUID;
+      oldPassword: string;
+      newPassword: string;
+    };
+
+    export type ChangeName = {
+      userId: UUID;
+      name: string;
+      tag: string;
+    };
+
+    export type SetRiskType = {
+      userId: UUID;
+      score: number | null;
+    };
+  }
 }
-
-export type RiskTypeDto =
-  | "STABLE"
-  | "STABLE_SEEK"
-  | "NEUTRAL"
-  | "ACTIVE"
-  | "AGGRESSIVE";
-
-export type UserDto = {
-  id: UUID;
-  email: string;
-  name: string;
-  tag: string;
-  riskType: RiskTypeDto | null;
-};
-
-export type ChangePasswordReqDto = {
-  userId: UUID;
-  oldPassword: string;
-  newPassword: string;
-};

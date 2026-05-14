@@ -11,16 +11,16 @@ export const createPlanService = ({
   createPlan: async (mtrf) => {
     if (!isValidPlan(mtrf)) {
       throw new DomainError(
-        ErrorCodes.INV_PROFILE.INVALID_INVESTMENT_PLAN,
+        ErrorCodes.PLAN.INVALID_INVESTMENT_PLAN,
         "The provided plan parameters are invalid.",
       );
     }
-    const plan = await planRepository.createPlan(mtrf);
+    const plan = await planRepository.create(mtrf);
     return Plan.Map.toRoot(plan);
   },
 
   getPlan: async (projectId) => {
-    const plan = await planRepository.getPlan(projectId);
+    const plan = await planRepository.get(projectId);
     return plan ? Plan.Map.toRoot(plan) : null;
   },
 });

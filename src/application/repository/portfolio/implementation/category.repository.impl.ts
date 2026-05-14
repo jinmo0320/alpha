@@ -43,6 +43,10 @@ export const createCategoryRepository = (): CategoryRepository => {
       return rows.map(mapCategory);
     },
 
+    get: async (categoryId) => {
+      return await getCategoryById(categoryId);
+    },
+
     create: async (req) => {
       const conn = await db.getConnection();
       try {

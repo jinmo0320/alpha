@@ -18,7 +18,6 @@ CREATE TABLE project_plans (
     project_id INT NOT NULL,
     plan_id INT NOT NULL UNIQUE,
     version INT NOT NULL DEFAULT 1,
-    is_active BOOLEAN DEFAULT TRUE,
 
     PRIMARY KEY (project_id, plan_id),
     UNIQUE (project_id, version),

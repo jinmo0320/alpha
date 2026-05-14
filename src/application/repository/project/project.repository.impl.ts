@@ -3,16 +3,8 @@ import db from "src/externals/database/db";
 import { Project } from "src/application/model/project.model";
 import { ProjectRepository } from "./project.repository";
 
-const mapProject = (row: RowDataPacket): Project.Entity => ({
-  id: Number(row.id),
-  name: row.name,
-  status: row.status,
-  createdAt: new Date(row.createdAt),
-  updatedAt: new Date(row.updatedAt),
-});
-
 export const createProjectRepository = (): ProjectRepository => ({
-  createProject: async (req) => {
+  create: async (req) => {
     const [result] = await db.execute<ResultSetHeader>(
       `INSERT INTO projects (user_id, name)
        VALUES (?, ?)`,
@@ -31,13 +23,13 @@ export const createProjectRepository = (): ProjectRepository => ({
        LIMIT 1`,
       [result.insertId],
     );
-    const project = rows.length > 0 ? mapProject(rows[0]) : null;
+    const project = rows.length > 0 ? Project.Map.toEntity(rows[0]) : null;
     if (!project) throw new Error("Failed to create project");
 
     return project;
   },
 
-  getProjectList: async (userId) => {
+  getAll: async (userId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
         id,
@@ -51,10 +43,10 @@ export const createProjectRepository = (): ProjectRepository => ({
       [userId],
     );
 
-    return rows.map(mapProject);
+    return rows.map(Project.Map.toEntity);
   },
 
-  getProject: async (projectId) => {
+  get: async (projectId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
         id,
@@ -68,6 +60,6 @@ export const createProjectRepository = (): ProjectRepository => ({
       [projectId],
     );
 
-    return rows.length > 0 ? mapProject(rows[0]) : null;
+    return rows.length > 0 ? Project.Map.toEntity(rows[0]) : null;
   },
 });

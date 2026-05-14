@@ -2,7 +2,6 @@ CREATE TABLE portfolios (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
     name VARCHAR(100),
-    status ENUM('PENDING', 'STABLE', 'DISABLED') NOT NULL DEFAULT 'PENDING',
     min_return DECIMAL(5,4) NOT NULL,
     max_return DECIMAL(5,4) NOT NULL,
 
@@ -14,7 +13,6 @@ CREATE TABLE project_portfolios (
     project_id INT NOT NULL,
     portfolio_id INT NOT NULL,
     version INT NOT NULL DEFAULT 1,
-    is_active BOOLEAN DEFAULT TRUE,
 
     PRIMARY KEY (project_id, portfolio_id),
     UNIQUE (portfolio_id),

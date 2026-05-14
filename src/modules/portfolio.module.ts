@@ -44,6 +44,7 @@ router.delete(
 router.get(
   "/categories/:categoryId/items/available",
   authenticate,
+  portFolioLoader,
   ctrl.getAvailableItems,
 );
 router.get(
