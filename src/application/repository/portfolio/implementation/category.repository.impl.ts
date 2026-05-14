@@ -3,13 +3,6 @@ import { Category } from "src/application/model/category.model";
 import db from "src/externals/database/db";
 import { CategoryRepository } from "../interface/category.repository";
 
-const mapCategory = (row: RowDataPacket): Category.Entity => ({
-  id: Number(row.id),
-  code: row.code,
-  name: row.name,
-  description: row.description ?? "",
-});
-
 const getCategoryById = async (
   categoryId: number,
 ): Promise<Category.Entity | null> => {
@@ -21,7 +14,7 @@ const getCategoryById = async (
     [categoryId],
   );
 
-  return rows.length > 0 ? mapCategory(rows[0]) : null;
+  return rows.length > 0 ? Category.Map.toEntity(rows[0]) : null;
 };
 
 export const createCategoryRepository = (): CategoryRepository => {
@@ -40,7 +33,7 @@ export const createCategoryRepository = (): CategoryRepository => {
         [userId],
       );
 
-      return rows.map(mapCategory);
+      return rows.map(Category.Map.toEntity);
     },
 
     get: async (categoryId) => {

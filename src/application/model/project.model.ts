@@ -23,13 +23,12 @@ export namespace Project {
       warningCode: WarningCode;
     };
 
-    export type WarningCode = 
+    export type WarningCode =
       | "EMPTY_PLAN"
       | "EMPTY_PORTFOLIO"
       | "INVALID_PORTFOLIO"
       | "TYPE_PLAN_MISMATCH"
-      | "PLAN_PORTFOLIO_MISMATCH"
-    }
+      | "PLAN_PORTFOLIO_MISMATCH";
   }
 
   export namespace Req {

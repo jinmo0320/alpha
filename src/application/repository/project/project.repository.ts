@@ -3,23 +3,23 @@ import { Project } from "src/application/model/project.model";
 
 export type ProjectRepository = {
   /**
-   * 프로젝트 생성
-   * @param req 프로젝트 생성 요청 객체(유저 ID, 프로젝트 이름)
-   * @returns 프로젝트
+   * 프로젝트를 생성
+   * @param req 프로젝트 생성 정보
+   * @returns 생성된 프로젝트 정보
    */
   create: (req: Project.Req.Create) => Promise<Project.Entity>;
 
   /**
-   * 유저가 가진 프로젝트 목록 조회
-   * @param userId 유저 ID
+   * 사용자의 프로젝트 목록을 조회
+   * @param userId 사용자 ID
    * @returns 프로젝트 목록
    */
   getAll: (userId: UUID) => Promise<Project.Entity[]>;
 
   /**
-   * 프로젝트 조회
+   * 프로젝트를 조회
    * @param projectId 프로젝트 ID
-   * @returns 프로젝트 또는 null(프로젝트가 존재하지 않는 경우)
+   * @returns 프로젝트 정보 또는 null
    */
   get: (projectId: number) => Promise<Project.Entity | null>;
 };

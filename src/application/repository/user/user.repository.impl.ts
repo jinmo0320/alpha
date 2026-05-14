@@ -3,25 +3,39 @@ import db from "src/externals/database/db";
 import { UserRepository } from "src/application/repository/user/user.repository";
 import { User } from "src/application/model/user.model";
 
+const userColumns = `
+  id,
+  email,
+  name,
+  tag,
+  password AS hashedPassword,
+  risk_type AS riskType,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+`;
+
 export const createUserRepository = (): UserRepository => ({
-  createUser: async (user) => {
+  create: async (user) => {
     await db.execute(
       "INSERT INTO users (name, tag, email, password) VALUES (?, ?, ?, ?)",
-      [user.name, user.tag, user.email, user.hashedPassword],
+      [user.name, user.tag, user.email, user.password],
     );
 
     const [rows] = await db.execute<RowDataPacket[]>(
-      "SELECT * FROM users WHERE email = ?",
+      `SELECT ${userColumns} FROM users WHERE email = ?`,
       [user.email],
     );
 
-    const { id, name, tag, email, riskType } = rows[0];
-    return { id, name, tag, email, riskType };
+    return User.Map.toEntity(rows[0]);
+  },
+
+  delete: async (userId) => {
+    await db.execute("DELETE FROM users WHERE id = ?", [userId]);
   },
 
   findUserById: async (id) => {
     const [rows] = await db.execute<RowDataPacket[]>(
-      "SELECT * FROM users WHERE id = ?",
+      `SELECT ${userColumns} FROM users WHERE id = ?`,
       [id],
     );
 
@@ -29,13 +43,12 @@ export const createUserRepository = (): UserRepository => ({
       return null;
     }
 
-    const { name, tag, email, riskType } = rows[0];
-    return { id, name, tag, email, riskType };
+    return User.Map.toEntity(rows[0]);
   },
 
   findUserByEmail: async (email) => {
     const [rows] = await db.execute<RowDataPacket[]>(
-      "SELECT * FROM users WHERE email = ?",
+      `SELECT ${userColumns} FROM users WHERE email = ?`,
       [email],
     );
 
@@ -43,13 +56,12 @@ export const createUserRepository = (): UserRepository => ({
       return null;
     }
 
-    const { id, name, tag, riskType } = rows[0];
-    return { id, name, tag, email, riskType };
+    return User.Map.toEntity(rows[0]);
   },
 
   findUserByName: async (name, tag) => {
     const [rows] = await db.execute<RowDataPacket[]>(
-      "SELECT * FROM users WHERE name = ? AND tag = ?",
+      `SELECT ${userColumns} FROM users WHERE name = ? AND tag = ?`,
       [name, tag],
     );
 
@@ -57,8 +69,7 @@ export const createUserRepository = (): UserRepository => ({
       return null;
     }
 
-    const { id, email, riskType } = rows[0];
-    return { id, name, tag, email, riskType };
+    return User.Map.toEntity(rows[0]);
   },
 
   getUserPassword: async (id) => {
@@ -82,6 +93,14 @@ export const createUserRepository = (): UserRepository => ({
     ]);
   },
 
+  updateUserName: async ({ userId, name, tag }) => {
+    await db.execute("UPDATE users SET name = ?, tag = ? WHERE id = ?", [
+      name,
+      tag,
+      userId,
+    ]);
+  },
+
   getRiskType: async (userId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       "SELECT risk_type FROM users WHERE id = ?",
@@ -92,7 +111,7 @@ export const createUserRepository = (): UserRepository => ({
       return null;
     }
 
-    return rows[0].risk_type as User.RiskType | null;
+    return rows[0].risk_type as User.Entity.RiskType | null;
   },
 
   setRiskType: async (userId, riskType) => {
@@ -100,5 +119,12 @@ export const createUserRepository = (): UserRepository => ({
       riskType,
       userId,
     ]);
+
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT ${userColumns} FROM users WHERE id = ?`,
+      [userId],
+    );
+
+    return User.Map.toEntity(rows[0]);
   },
 });

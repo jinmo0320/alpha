@@ -2,14 +2,16 @@ import { Plan } from "src/application/model/plan.model";
 
 export type PlanRepository = {
   /**
-   * create a new plan with MTrF data and version update
-   * @param req project id and MTrF data
+   * 계획을 생성
+   * @param req 프로젝트 ID와 계획 정보
+   * @returns 생성된 계획 정보
    */
   create: (req: Plan.Req.Create) => Promise<Plan.Entity>;
+
   /**
-   * get the plan of a project
-   * @param projectId project id
-   * @returns the plan if found, otherwise null
+   * 프로젝트의 계획을 조회
+   * @param projectId 프로젝트 ID
+   * @returns 계획 정보 또는 null
    */
   get: (projectId: number) => Promise<Plan.Entity | null>;
 };

@@ -3,15 +3,6 @@ import { Item } from "src/application/model/item.model";
 import db from "src/externals/database/db";
 import { ItemRepository } from "../interface/item.repository";
 
-const mapItem = (row: RowDataPacket): Item.Entity => ({
-  id: Number(row.id),
-  categoryId: Number(row.categoryId),
-  name: row.name,
-  description: row.description ?? "",
-  minReturn: Number(row.minReturn),
-  maxReturn: Number(row.maxReturn),
-});
-
 const getItemById = async (itemId: number): Promise<Item.Entity | null> => {
   const [rows] = await db.execute<RowDataPacket[]>(
     `SELECT
@@ -27,7 +18,7 @@ const getItemById = async (itemId: number): Promise<Item.Entity | null> => {
     [itemId],
   );
 
-  return rows.length > 0 ? mapItem(rows[0]) : null;
+  return rows.length > 0 ? Item.Map.toEntity(rows[0]) : null;
 };
 
 export const createItemRepository = (): ItemRepository => {
@@ -48,7 +39,7 @@ export const createItemRepository = (): ItemRepository => {
         [userId],
       );
 
-      return rows.map(mapItem);
+      return rows.map(Item.Map.toEntity);
     },
 
     create: async (req) => {

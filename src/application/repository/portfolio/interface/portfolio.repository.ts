@@ -4,68 +4,69 @@ import { Portfolio } from "src/application/model/portfolio.model";
 
 export type PortfolioRepository = {
   /**
-   * 사용자 포트폴리오 전체 조회
+   * 프로젝트의 포트폴리오 목록을 조회
    * @param projectId 프로젝트 ID
-   * @returns 포트폴리오 리스트
+   * @returns 포트폴리오 목록
    */
   getAll: (projectId: number) => Promise<Portfolio.Entity[]>;
 
   /**
-   * 최신 버전 포트폴리오 조회
+   * 최신 포트폴리오를 조회
    * @param projectId 프로젝트 ID
-   * @returns 포트폴리오 상세 정보
+   * @returns 포트폴리오 정보 또는 null
    */
   get: (projectId: number) => Promise<Portfolio.Entity | null>;
 
   /**
-   * 포트폴리오 아이템 조회
+   * 포트폴리오 아이템을 조회
    * @param portfolioId 포트폴리오 ID
-   * @returns 아이템 리스트 (portion & alias 포함)
+   * @returns 포트폴리오 아이템 목록
    */
   getItemsInPortfolio: (
     portfolioId: number,
   ) => Promise<Portfolio.Entity.Item[]>;
 
   /**
-   * 프리셋 조회
+   * 프리셋을 조회
    * @param targetReturnPercent 목표 수익률
-   * @returns 프리셋 포트폴리오 (목표 수익률과 가장 근접한 것)
+   * @returns 프리셋 목록
    */
   getPresets(targetReturnPercent: number): Promise<Portfolio.Entity.Preset[]>;
 
   /**
-   * 프리셋 아이템 조회
+   * 프리셋 아이템을 조회
    * @param presetCode 프리셋 코드
-   * @returns 아이템 리스트 (portion 포함)
+   * @returns 프리셋 아이템 목록
    */
   getItemsInPreset: (presetCode: string) => Promise<Portfolio.Entity.Item[]>;
 
   /**
-   * 프리셋 기반으로 새로운 포트폴리오 생성
+   * 프리셋으로 포트폴리오를 생성
    * @param req 프로젝트 ID, 프리셋 코드
+   * @returns 생성된 포트폴리오 정보
    */
   createFromPreset: (req: Portfolio.Req.Create) => Promise<Portfolio.Entity>;
 
   /**
-   * 포트폴리오 아이템 초기화
-   * @param req 포트폴리오 ID, 아이템 목록과 각 아이템의 비중
-   * @return 설정된 포트폴리오 정보
+   * 포트폴리오 아이템을 초기화
+   * @param req 포트폴리오 ID와 아이템 설정 정보
+   * @returns 설정된 포트폴리오 정보
    */
   init: (req: Portfolio.Req.Set) => Promise<Portfolio.Entity>;
 
   /**
-   * 포트폴리오에 추가 가능한 카테고리 목록 가져오기
+   * 추가 가능한 카테고리를 조회
    * @param req 사용자 ID, 포트폴리오 ID
-   * @return 추가 가능한 카테고리 리스트
+   * @returns 추가 가능한 카테고리 목록
    */
   getAvailableCategories: (
     req: Category.Req.Available,
   ) => Promise<Category.Entity[]>;
 
   /**
-   * 포트폴리오에 추가 가능한 아이템 목록 가져오기
+   * 추가 가능한 아이템을 조회
    * @param req 사용자 ID, 포트폴리오 ID, 카테고리 ID
-   * @return 추가 가능한 아이템 리스트
+   * @returns 추가 가능한 아이템 목록
    */
   getAvailableItems: (req: Item.Req.Available) => Promise<Item.Entity[]>;
 };

@@ -1,4 +1,5 @@
 import { UUID } from "crypto";
+import { RowDataPacket } from "mysql2";
 
 export namespace User {
   // DB Entity
@@ -65,5 +66,19 @@ export namespace User {
       userId: UUID;
       score: number | null;
     };
+  }
+
+  // Mapping Functions
+  export namespace Map {
+    export const toEntity = (row: RowDataPacket): Entity => ({
+      id: row.id,
+      email: row.email,
+      name: row.name,
+      tag: row.tag,
+      hashedPassword: row.hashedPassword,
+      riskType: row.riskType,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    });
   }
 }
