@@ -80,5 +80,15 @@ export namespace User {
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     });
+
+    export const toRoot = (entity: Entity): Res.Root => ({
+      id: entity.id,
+      email: entity.email,
+      name: entity.name,
+      tag: entity.tag,
+      riskType: entity.riskType,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    });
   }
 }

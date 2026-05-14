@@ -20,7 +20,10 @@ export const validatePassword = (password: string): boolean => {
  * @param score 총 설문 점수
  * @returns 투자 성향 타입 또는 null (유효하지 않은 점수)
  */
-export const determineRiskType = (score: number): User.RiskType | null => {
+export const determineRiskType = (
+  score: number,
+): User.Entity.RiskType | null => {
+  if (score < 10) return null;
   if (score >= 10 && score <= 15) return "STABLE";
   if (score <= 20) return "STABLE_SEEK";
   if (score <= 25) return "NEUTRAL";

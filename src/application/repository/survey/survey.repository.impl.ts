@@ -37,7 +37,7 @@ export const createSurveyRepository = (): SurveyRepository => ({
       questionMap.get(row.question_id)!.answers.push(row.answer_text);
     });
 
-    const questions: Survey.Question[] = Array.from(questionMap.values())
+    const questions: Survey.Entity[] = Array.from(questionMap.values())
       .sort((a, b) => a.order - b.order)
       .map((q) => ({
         title: q.text,

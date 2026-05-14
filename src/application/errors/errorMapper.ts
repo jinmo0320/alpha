@@ -23,6 +23,7 @@ const ErrorStatusMap: Record<string, number> = {
   /* ================= USER ================= */
   [ErrorCodes.USER.NOT_FOUND]: 404,
   [ErrorCodes.USER.CURRENT_PASSWORD_NOT_MATCHED]: 401,
+  [ErrorCodes.USER.NAME_ALREADY_EXISTS]: 409,
   [ErrorCodes.USER.INVALID_RISK_SCORE]: 400,
 
   /* ================= SURVEY ================= */
