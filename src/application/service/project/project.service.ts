@@ -22,8 +22,5 @@ export type ProjectService = {
    * @param projectId 프로젝트 ID
    * @returns 프로젝트 상세 정보 또는 null
    */
-  getProject: (
-    userId: UUID,
-    projectId: number,
-  ) => Promise<Project.Res.Detail | null>;
+  getProject: (userId: UUID, projectId: number) => Promise<Project.Res.Detail>;
 };

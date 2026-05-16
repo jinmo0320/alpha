@@ -1,4 +1,3 @@
-import { Domain } from "domain";
 import { PortfolioDeps } from "./portfolio.deps";
 import { PortfolioService } from "./portfolio.service";
 import { DomainError } from "src/application/errors/error";
