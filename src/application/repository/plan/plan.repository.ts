@@ -25,7 +25,7 @@ export type PlanRepository = {
   /**
    * 프로젝트의 현재 계획 날짜 정보를 설정
    * @param req 프로젝트 ID와 날짜 정보
-   * @returns 수정된 계획 정보 또는 null
+   * @returns 없음
    */
   setDate: (req: Plan.Req.Day) => Promise<void>;
 };

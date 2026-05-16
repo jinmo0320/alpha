@@ -1,7 +1,7 @@
 import { User } from "./user.model";
 
 export namespace Auth {
-  // DTO Response and Requse
+  // DTO Response and Request
   export namespace Res {
     export type Success = {
       accessToken: string;

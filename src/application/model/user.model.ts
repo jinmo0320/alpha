@@ -23,7 +23,7 @@ export namespace User {
       | "AGGRESSIVE";
   }
 
-  // DTO Response and Requset
+  // DTO Response and Request
   export namespace Res {
     export type Root = {
       id: UUID;

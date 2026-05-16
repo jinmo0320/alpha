@@ -80,7 +80,24 @@ export const createPortfolioService = ({
 
     getAllPortfolios: async (projectId) => {
       const portfolios = await portfolioRepository.getAll(projectId);
-      return portfolios;
+      const portfoliosReturn: Portfolio.Res.Root[] = await Promise.all(
+        portfolios.map(async (portfolio) => {
+          const items = await portfolioRepository.getItemsInPortfolio(
+            portfolio.id,
+          );
+          const categories = await categorizeItems(items);
+
+          const portfolioReturn: Portfolio.Res.Root = {
+            ...portfolio,
+            categories,
+            status: "PENDING",
+          };
+          portfolioReturn.status = evaluatePortfolio(portfolioReturn);
+          return portfolioReturn;
+        }),
+      );
+
+      return portfoliosReturn;
     },
 
     recommendPresets: async (projectId) => {
@@ -88,7 +105,9 @@ export const createPortfolioService = ({
       if (!plan)
         throw new DomainError(ErrorCodes.PLAN.NOT_FOUND, "Plan not found");
 
-      const presets = await portfolioRepository.getPresets(plan.expectedReturn);
+      const presets = await portfolioRepository.getPresets(
+        plan.expectedReturn * 100,
+      );
 
       const presetsReturn: Portfolio.Res.Preset[] = await Promise.all(
         presets.map(async (preset) => {

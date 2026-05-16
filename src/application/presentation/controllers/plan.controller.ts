@@ -38,7 +38,7 @@ export const planController = (planService: PlanService) => ({
 
     res.status(200).json({
       success: true,
-      message: "Successfully fetched.",
+      message: "Plan fetched successfully.",
       data: { plan },
     });
   },
@@ -46,12 +46,12 @@ export const planController = (planService: PlanService) => ({
   /* ================= 모든 플랜 가져오기 ================= */
   getAllPlans: async (req: Request, res: Response) => {
     const projectId = req.projectId!;
-    const plan = await planService.getAllPlans(projectId);
+    const plans = await planService.getAllPlans(projectId);
 
     res.status(200).json({
       success: true,
-      message: "Successfully fetched.",
-      data: { plan },
+      message: "Plans fetched successfully.",
+      data: { plans },
     });
   },
 
@@ -66,7 +66,7 @@ export const planController = (planService: PlanService) => ({
 
     res.status(200).json({
       success: true,
-      message: "Successfully fetched.",
+      message: "Plan date updated successfully.",
     });
   },
 
@@ -93,7 +93,7 @@ export const planController = (planService: PlanService) => ({
 
     res.status(200).json({
       success: true,
-      message: "Successfully fetched.",
+      message: "Plan updated successfully.",
       data: { plan },
     });
   },

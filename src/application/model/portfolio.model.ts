@@ -32,8 +32,6 @@ export namespace Portfolio {
 
   // DTO Response and Request
   export namespace Res {
-    export type Abstract = Entity;
-
     export type Root = Entity & {
       categories: (Category.Entity & {
         portion: number;

@@ -23,7 +23,7 @@ export const projectController = (projectService: ProjectService) => ({
 
     res.status(200).json({
       success: true,
-      message: "Created project.",
+      message: "Project fetched successfully.",
       data: { project },
     });
   },
@@ -35,7 +35,7 @@ export const projectController = (projectService: ProjectService) => ({
 
     res.status(200).json({
       success: true,
-      message: "Created project.",
+      message: "Projects fetched successfully.",
       data: { projects },
     });
   },

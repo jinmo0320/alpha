@@ -20,7 +20,7 @@ export type ProjectService = {
    * 프로젝트 상세 정보를 조회
    * @param userId 사용자 ID
    * @param projectId 프로젝트 ID
-   * @returns 프로젝트 상세 정보 또는 null
+   * @returns 프로젝트 상세 정보
    */
   getProject: (userId: UUID, projectId: number) => Promise<Project.Res.Detail>;
 };

@@ -6,7 +6,7 @@ export const surveyController = (surveyService: SurveyService) => ({
     const questions = await surveyService.getInvestmentQuestions();
     res.status(200).json({
       success: true,
-      message: "질문 목록을 대령했습니다.",
+      message: "Investment questions fetched successfully.",
       data: { questions },
     });
   },

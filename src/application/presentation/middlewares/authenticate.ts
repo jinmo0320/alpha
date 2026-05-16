@@ -44,7 +44,7 @@ export const authenticate = async (
       throw new DomainError(ErrorCodes.USER.NOT_FOUND, "User not found.");
     }
 
-    /* 4. 토큰 속 사용자 정보 담아서 보냄 */
+    /* 4. 토큰 속 사용자 ID를 담아서 보냄 */
     req.userId = payload.userId;
 
     next();

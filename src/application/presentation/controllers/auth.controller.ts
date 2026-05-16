@@ -83,7 +83,10 @@ export const authContoller = (authService: AuthService) => ({
   checkForgotCode: async (req: Request, res: Response) => {
     const { email, code } = req.body;
     await authService.checkForgotCode({ email, code });
-    res.status(200).json({ success: true, message: "Email verified" });
+    res.status(200).json({
+      success: true,
+      message: "Password reset code verified.",
+    });
   },
 
   /* ================= 비밀번호 재설정 ================= */

@@ -57,7 +57,7 @@ export const evaluateProject = (
   if (!riskType)
     return {
       status: "WARNING",
-      warningCode: "TYPE_PLAN_MISMATCH",
+      warningCode: "EMPTY_RISK_TYPE",
     };
 
   // PLAN AND RISK TYPE MISMATCH

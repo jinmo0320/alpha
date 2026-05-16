@@ -23,7 +23,7 @@ export type PortfolioService = {
    * @param projectId 프로젝트 ID
    * @returns 포트폴리오 목록
    */
-  getAllPortfolios: (projectId: number) => Promise<Portfolio.Res.Abstract[]>;
+  getAllPortfolios: (projectId: number) => Promise<Portfolio.Res.Root[]>;
 
   /**
    * 추천 프리셋을 조회

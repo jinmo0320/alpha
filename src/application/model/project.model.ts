@@ -30,6 +30,7 @@ export namespace Project {
     export type WarningCode =
       | "EMPTY_PLAN"
       | "EMPTY_PORTFOLIO"
+      | "EMPTY_RISK_TYPE"
       | "INVALID_PORTFOLIO"
       | "TYPE_PLAN_MISMATCH"
       | "PLAN_PORTFOLIO_MISMATCH";

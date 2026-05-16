@@ -49,7 +49,7 @@ export const createPlanRepository = (): PlanRepository => ({
       );
 
       // 생성된 플랜 조회
-      const [[plan]] = await db.execute<RowDataPacket[]>(
+      const [[plan]] = await conn.execute<RowDataPacket[]>(
         `SELECT
           p.initial_amount AS initialAmount,
           p.monthly_amount AS monthlyAmount,
