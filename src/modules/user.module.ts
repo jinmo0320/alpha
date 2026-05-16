@@ -20,6 +20,7 @@ const ctrl = userController(service);
 
 router.get("/", authenticate, ctrl.me);
 router.patch("/password", authenticate, ctrl.changePassword);
+router.patch("/name", authenticate, ctrl.changeName);
 router.post("/risk", authenticate, ctrl.assessInvestmentRisk);
 router.patch("/risk", authenticate, ctrl.clearInvestmentRisk);
 

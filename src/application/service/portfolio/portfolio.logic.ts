@@ -14,12 +14,12 @@ export const evaluatePortfolio = (
   );
 
   if (Math.abs(totalPortion - PORTION_TOTAL) < PORTION_TOLERANCE) {
-    return Portfolio.Res.Status.STABLE;
+    return "STABLE";
   }
 
   if (totalPortion > PORTION_TOTAL) {
-    return Portfolio.Res.Status.OVER_ALLOCATED;
+    return "OVER_ALLOCATED";
   }
 
-  return Portfolio.Res.Status.PENDING;
+  return "PENDING";
 };

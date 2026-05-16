@@ -2,6 +2,7 @@ import { SurveyDeps } from "./survey.deps";
 import { SurveyService } from "./survey.service";
 import { DomainError } from "src/application/errors/error";
 import { ErrorCodes } from "src/application/errors/errorCodes";
+import { Survey } from "src/application/model/survey.model";
 
 export const createSurveyService = ({
   surveyRepository,
@@ -16,9 +17,11 @@ export const createSurveyService = ({
       );
     }
 
-    return questions.map((question) => ({
-      title: question.title,
-      answers: question.answers,
-    }));
+    return questions.map(
+      (question): Survey.Res.Root => ({
+        title: question.title,
+        answers: question.answers,
+      }),
+    );
   },
 });

@@ -2,18 +2,10 @@ import { Request, Response } from "express";
 import { PortfolioService } from "../../service/portfolio/portfolio.service";
 
 export const portfolioController = (portfolioService: PortfolioService) => ({
-  // === 포폴 전체 & 추천 ===
-  getMyPortfolio: async (req: Request, res: Response) => {
-    const portfolio = await portfolioService.getPortfolio(req.user!.id);
-    res.status(200).json({
-      success: true,
-      message: "포트폴리오를 가져왔습니다.",
-      data: { portfolio },
-    });
-  },
-
+  /* ================= 포트폴리오 프리셋 추천 ================= */
   getRecommendations: async (req: Request, res: Response) => {
-    const presets = await portfolioService.getRecommendations(req.user!.id);
+    const projectId = Number(req.params.projectId);
+    const presets = await portfolioService.recommendPresets(projectId);
     res.status(200).json({
       success: true,
       message: "추천 포트폴리오 프리셋을 가져왔습니다",
@@ -21,17 +13,22 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
     });
   },
 
+  /* ================= 포폴 프리셋으로 생성 ================= */
   createFromPreset: async (req: Request, res: Response) => {
-    const { presetCode } = req.body; // 프론트에서 선택한 프리셋 코드
-    await portfolioService.createFromPreset({
-      userId: req.user!.id,
+    const projectId = Number(req.params.projectId);
+    const { presetCode } = req.body;
+    const portfolio = await portfolioService.createFromPreset({
+      projectId,
       presetCode,
     });
     res.status(201).json({
       success: true,
       message: "Portfolio created from preset successfully.",
+      data: { portfolio },
     });
   },
+
+  initPortfolio
 
   // === 자산군 ===
   getCategories: async (req: Request, res: Response) => {
@@ -139,5 +136,4 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
     });
     res.status(200).json({ success: true, message: "Asset Item deleted." });
   },
-
 });

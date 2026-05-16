@@ -10,6 +10,7 @@ import {
 import { Timer } from "src/utils/timer";
 import { DomainError } from "src/application/errors/error";
 import { ErrorCodes } from "src/application/errors/errorCodes";
+import { User } from "src/application/model/user.model";
 
 export const createAuthService = ({
   userRepository,
@@ -52,11 +53,11 @@ export const createAuthService = ({
     /* 1. 비밀번호 해싱 */
     const hashedPassword = await BcryptHelper.hashPassword(password);
     /* 2. 유저 생성 */
-    const user = await userRepository.createUser({
+    const user = await userRepository.create({
       name,
       tag,
       email,
-      hashedPassword,
+      password: hashedPassword,
     });
     /* 3. 토큰 생성 및 반환 */
     const accessToken = TokenProvider.generateAccessToken({ userId: user.id });
@@ -65,7 +66,7 @@ export const createAuthService = ({
     });
     await authRepository.saveRefreshToken(user.id, refreshToken);
 
-    return { accessToken, refreshToken, user };
+    return { accessToken, refreshToken, user: User.Map.toRoot(user) };
   },
 
   login: async ({ email, password }) => {
@@ -110,7 +111,7 @@ export const createAuthService = ({
     });
     await authRepository.saveRefreshToken(user.id, refreshToken);
 
-    return { accessToken, refreshToken, user };
+    return { accessToken, refreshToken, user: User.Map.toRoot(user) };
   },
 
   sendVerificationCode: async (email) => {
@@ -137,6 +138,7 @@ export const createAuthService = ({
     await authRepository.saveVerificationCode(email, code);
     /* 3. 응답 반환 */
     return {
+      email,
       createdAt: Timer.getTimestampKST(),
       expiredAt: Timer.getTimestampKST(5),
     };
@@ -182,6 +184,7 @@ export const createAuthService = ({
     await authRepository.saveVerificationCode(email, code);
     /* 3. 응답 반환 */
     return {
+      email,
       createdAt: Timer.getTimestampKST(),
       expiredAt: Timer.getTimestampKST(5),
     };

@@ -37,7 +37,10 @@ export type UserService = {
    * @param userId 사용자 ID
    * @param score 투자 성향 점수 또는 null
    * @errors USER_NOT_FOUND, INVALID_RISK_SCORE
-   * @returns 없음
+   * @returns 사용자 투자 성향
    */
-  setRiskType: (userId: UUID, score: number | null) => Promise<void>;
+  setRiskType: (
+    userId: UUID,
+    score: number | null,
+  ) => Promise<User.Res.Root["riskType"]>;
 };

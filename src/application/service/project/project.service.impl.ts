@@ -3,6 +3,7 @@ import { Project } from "src/application/model/project.model";
 import { ProjectDeps } from "./project.deps";
 import { DomainError } from "src/application/errors/error";
 import { ErrorCodes } from "src/application/errors/errorCodes";
+import { evaluateProject } from "./project.logic";
 
 export const createProjectService = ({
   projectRepository,
@@ -22,7 +23,7 @@ export const createProjectService = ({
   },
 
   getProject: async (userId, projectId) => {
-    const riskType = userRepository.getRiskType(userId);
+    const riskType = await userRepository.getRiskType(userId);
 
     const project = await projectRepository.get(projectId);
     if (!project)
@@ -35,7 +36,12 @@ export const createProjectService = ({
       ...project,
       portfolio,
       plan,
+      warningCode: null,
     };
+
+    const { status, warningCode } = evaluateProject(riskType, projectReturn);
+    projectReturn.status = status;
+    projectReturn.warningCode = warningCode;
 
     return projectReturn;
   },

@@ -1,4 +1,4 @@
-import { SurveyDto } from "src/application/model/survey.model";
+import { Survey } from "src/application/model/survey.model";
 
 export type SurveyService = {
   /**
@@ -6,5 +6,5 @@ export type SurveyService = {
    * @errors QUESTIONS_NOT_FOUND
    * @returns 투자 성향 질문 리스트
    */
-  getInvestmentQuestions: () => Promise<SurveyDto[]>;
+  getInvestmentQuestions: () => Promise<Survey.Res.Root[]>;
 };

@@ -8,10 +8,14 @@ export namespace Project {
   export type Entity = {
     id: number;
     name: string;
-    status: "PENDING" | "STABLE" | "WARNING" | "DISABLED";
+    status: Entity.Status;
     createdAt: Date;
     updatedAt: Date;
   };
+
+  export namespace Entity {
+    export type Status = "PENDING" | "STABLE" | "WARNING" | "DISABLED";
+  }
 
   // DTO Response and Request
   export namespace Res {
@@ -20,7 +24,7 @@ export namespace Project {
     export type Detail = Entity & {
       portfolio: Portfolio.Res.Root | null;
       plan: Plan.Res.Root | null;
-      warningCode: WarningCode;
+      warningCode: WarningCode | null;
     };
 
     export type WarningCode =

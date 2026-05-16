@@ -47,6 +47,7 @@ export const authContoller = (authService: AuthService) => ({
       success: true,
       message: "Verification email sent",
       data: {
+        email,
         createdAt,
         expiredAt,
       },
@@ -71,6 +72,7 @@ export const authContoller = (authService: AuthService) => ({
       success: true,
       message: "Forgot password email sent",
       data: {
+        email,
         createdAt,
         expiredAt,
       },

@@ -51,11 +51,10 @@ export namespace Portfolio {
       })[];
     };
 
-    export enum Status {
-      PENDING = "PENDING", // 미완성
-      STABLE = "STABLE", // 완성
-      OVER_ALLOCATED = "OVER_ALLOCATED", // 오류
-    }
+    export type Status =
+      | "PENDING" // 미완성
+      | "STABLE" // 완성
+      | "OVER_ALLOCATED"; // 오류
   }
 
   export namespace Req {

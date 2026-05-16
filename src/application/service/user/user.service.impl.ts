@@ -86,8 +86,10 @@ export const createUserService = ({
         );
       }
       await userRepository.setRiskType(userId, riskType);
+      return riskType;
     } else {
       await userRepository.setRiskType(userId, null);
+      return null;
     }
   },
 });

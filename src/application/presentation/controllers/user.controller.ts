@@ -24,6 +24,18 @@ export const userController = (userService: UserService) => ({
     });
   },
 
+  /* ================= 닉네임 변경 ================= */
+  changeName: async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    const { name, tag } = req.body;
+    const user = await userService.changeName({ userId, name, tag });
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+      data: { user },
+    });
+  },
+
   /* ================= 투자 성향 평가 ================= */
   assessInvestmentRisk: async (req: Request, res: Response) => {
     const userId = req.user!.id;

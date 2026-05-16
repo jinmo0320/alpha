@@ -57,7 +57,7 @@ export const createPortfolioService = ({
       const portfolioReturn: Portfolio.Res.Root = {
         ...portfolio,
         categories,
-        status: Portfolio.Res.Status.PENDING,
+        status: "PENDING",
       };
       portfolioReturn.status = evaluatePortfolio(portfolioReturn);
       return portfolioReturn;
@@ -92,13 +92,13 @@ export const createPortfolioService = ({
       const portfolioReturn: Portfolio.Res.Root = {
         ...portfolio,
         categories,
-        status: Portfolio.Res.Status.PENDING,
+        status: "PENDING",
       };
       portfolioReturn.status = evaluatePortfolio(portfolioReturn);
       return portfolioReturn;
     },
 
-    initPortfolio: async (req) => {
+    setPortfolioItems: async (req) => {
       const portfolio = await portfolioRepository.init(req);
       const items = await portfolioRepository.getItemsInPortfolio(portfolio.id);
       const categories = await categorizeItems(items);
@@ -106,7 +106,7 @@ export const createPortfolioService = ({
       const portfolioReturn: Portfolio.Res.Root = {
         ...portfolio,
         categories,
-        status: Portfolio.Res.Status.PENDING,
+        status: "PENDING",
       };
       portfolioReturn.status = evaluatePortfolio(portfolioReturn);
       return portfolioReturn;
