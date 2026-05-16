@@ -7,11 +7,11 @@ export namespace Plan {
 
     initialAmount: number;
     monthlyAmount: number;
+    startDate: Date;
     period: number;
     expectedReturn: number;
     targetAmount: number;
 
-    startDate: Date | null;
     paymentDay: number | null;
 
     createdAt: Date;
@@ -28,13 +28,14 @@ export namespace Plan {
       projectId: number;
       initialAmount: number;
       monthlyAmount: number;
+      startDate: Date;
       period: number;
       expectedReturn: number;
       targetAmount: number;
     };
 
-    export type Date = {
-      startDate: Date;
+    export type Day = {
+      projectId: number;
       paymentDay: number;
     };
   }
@@ -48,7 +49,7 @@ export namespace Plan {
       period: Number(row.period),
       expectedReturn: Number(row.expectedReturn),
       targetAmount: Number(row.targetAmount),
-      startDate: row.startDate === null ? null : new Date(row.startDate),
+      startDate: new Date(row.startDate),
       paymentDay: row.paymentDay === null ? null : Number(row.paymentDay),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),

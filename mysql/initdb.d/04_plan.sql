@@ -3,11 +3,11 @@ CREATE TABLE plans (
 
     initial_amount BIGINT NOT NULL,
     monthly_amount INT NOT NULL,
+    start_date DATE NOT NULL,
     period INT NOT NULL,
     expected_return DECIMAL(5,4) NOT NULL,
     target_amount BIGINT NOT NULL,
 
-    start_date DATE,
     payment_day TINYINT,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

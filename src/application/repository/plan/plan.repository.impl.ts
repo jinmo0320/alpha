@@ -16,13 +16,15 @@ export const createPlanRepository = (): PlanRepository => ({
         `INSERT INTO plans (
           initial_amount,
           monthly_amount,
+          start_date,
           period,
           expected_return,
           target_amount
-        ) VALUES (?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
         [
           mtrf.initialAmount,
           mtrf.monthlyAmount,
+          mtrf.startDate,
           mtrf.period,
           mtrf.expectedReturn,
           mtrf.targetAmount,
@@ -100,5 +102,46 @@ export const createPlanRepository = (): PlanRepository => ({
     );
 
     return rows.length > 0 ? Plan.Map.toEntity(rows[0]) : null;
+  },
+
+  getAll: async (projectId) => {
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT
+        p.initial_amount AS initialAmount,
+        p.monthly_amount AS monthlyAmount,
+        p.start_date AS startDate,
+        p.payment_day AS paymentDay,
+        p.period,
+        p.expected_return AS expectedReturn,
+        p.target_amount AS targetAmount,
+        p.created_at AS createdAt,
+        p.updated_at AS updatedAt,
+        pp.version
+       FROM plans p
+       JOIN project_plans pp ON p.id = pp.plan_id
+       WHERE pp.project_id = ?
+       ORDER BY pp.version DESC`,
+      [projectId],
+    );
+
+    return rows.map(Plan.Map.toEntity);
+  },
+
+  setDate: async ({ projectId, paymentDay }) => {
+    await db.execute(
+      `UPDATE plans
+       SET payment_day = ?
+       WHERE id = (
+         SELECT plan_id
+         FROM (
+           SELECT plan_id
+           FROM project_plans
+           WHERE project_id = ?
+           ORDER BY version DESC
+           LIMIT 1
+         ) latest_plan
+       )`,
+      [paymentDay, projectId],
+    );
   },
 });
