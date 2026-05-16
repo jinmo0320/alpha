@@ -29,8 +29,8 @@ export const createProjectService = ({
     if (!project)
       throw new DomainError(ErrorCodes.PROJECT.NOT_FOUND, "project not found.");
 
-    const portfolio = await portfolioService.getPortfolio(project.id);
-    const plan = await planService.getPlan(project.id);
+    const portfolio = await portfolioService.getLatestPortfolio(project.id);
+    const plan = await planService.getLatestPlan(project.id);
 
     const projectReturn: Project.Res.Detail = {
       ...project,

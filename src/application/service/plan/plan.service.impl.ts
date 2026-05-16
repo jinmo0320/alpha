@@ -50,7 +50,7 @@ export const createPlanService = ({
     return Plan.Map.toRoot(updatedPlan);
   },
 
-  getPlan: async (projectId) => {
+  getLatestPlan: async (projectId) => {
     const plan = await planRepository.get(projectId);
     return plan ? Plan.Map.toRoot(plan) : null;
   },

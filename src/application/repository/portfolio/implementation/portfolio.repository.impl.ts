@@ -53,6 +53,10 @@ const recalculatePortfolioReturn = async (
 };
 
 export const createPortfolioRepository = (): PortfolioRepository => ({
+  get: async (portfolioId) => {
+    return await getPortfolioById(db, portfolioId);
+  },
+
   getAll: async (projectId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
@@ -72,7 +76,7 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     return rows.map(Portfolio.Map.toEntity);
   },
 
-  get: async (projectId) => {
+  getLatest: async (projectId) => {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT
         p.id,
@@ -228,55 +232,87 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
     }
   },
 
-  init: async (req) => {
+  setItems: async (req) => {
     const conn = await db.getConnection();
 
     try {
       await conn.beginTransaction();
 
-      // 기존 아이템 할당 삭제
-      await conn.execute(
-        `DELETE FROM item_allocation
-         WHERE portfolio_id = ?`,
+      // 기존 포트폴리오 정보 조회
+      const [currentRows] = await conn.execute<RowDataPacket[]>(
+        `SELECT
+          p.name,
+          pp.project_id AS projectId
+         FROM portfolios p
+         JOIN project_portfolios pp ON pp.portfolio_id = p.id
+         WHERE p.id = ?
+         LIMIT 1`,
         [req.portfolioId],
       );
+      if (currentRows.length === 0) throw new Error("Portfolio not found");
 
-      // 각 item 정보를 item allocation에 삽입
+      const currentPortfolio = currentRows[0];
+
+      // 새로운 포트폴리오 생성
+      const [portfolioResult] = await conn.execute<ResultSetHeader>(
+        `INSERT INTO portfolios (name, min_return, max_return)
+         VALUES (?, 0, 0)`,
+        [currentPortfolio.name],
+      );
+      const portfolioId = portfolioResult.insertId;
+
+      // 포트폴리오 버전 업데이트
+      const [[versionRow]] = await conn.execute<RowDataPacket[]>(
+        `SELECT COALESCE(MAX(version), 0) + 1 AS nextVersion
+         FROM project_portfolios
+         WHERE project_id = ?`,
+        [currentPortfolio.projectId],
+      );
+      const nextVersion = Number(versionRow.nextVersion);
+
+      // 새 포트폴리오를 프로젝트에 연결
+      await conn.execute(
+        `INSERT INTO project_portfolios (
+          project_id,
+          portfolio_id,
+          version
+        ) VALUES (?, ?, ?)`,
+        [currentPortfolio.projectId, portfolioId, nextVersion],
+      );
+
+      // 포트폴리오에 아이템 할당
       for (const item of req.items) {
-        const [items] = await conn.execute<RowDataPacket[]>(
-          `SELECT id, category_id, name, description
-           FROM items
-           WHERE id = ?
-           LIMIT 1`,
-          [item.itemId],
-        );
-        if (items.length === 0) throw new Error("Item not found");
-
-        const masterItem = items[0];
         await conn.execute(
           `INSERT INTO item_allocation (
             portfolio_id,
             item_id,
             category_id,
+            portion,
             alias,
-            alias_description,
-            portion
-          ) VALUES (?, ?, ?, ?, ?, ?)`,
+            alias_description
+          )
+          SELECT
+            ?,
+            id,
+            category_id,
+            ?,
+            ?,
+            ?
+          FROM items
+          WHERE id = ?`,
           [
-            req.portfolioId,
-            item.itemId,
-            masterItem.category_id,
+            portfolioId,
+            item.portion,
             item.alias ?? null,
             item.aliasDescription ?? null,
-            item.portion,
+            item.itemId,
           ],
         );
       }
 
-      await recalculatePortfolioReturn(conn, req.portfolioId);
-
-      const portfolio = await getPortfolioById(conn, req.portfolioId);
-      if (!portfolio) throw new Error("Failed to initialize portfolio");
+      await recalculatePortfolioReturn(conn, portfolioId);
+      const portfolio = await getPortfolioById(conn, portfolioId);
+      if (!portfolio) throw new Error("Portfolio not found");
 
       await conn.commit();
       return portfolio;

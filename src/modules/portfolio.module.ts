@@ -8,6 +8,7 @@ import { Portfolio } from "src/application/model/portfolio.model";
 import { PortfolioDeps } from "src/application/service/portfolio/portfolio.deps";
 import { createPlanRepository } from "src/application/repository/plan/plan.repository.impl";
 import { createCategoryRepository } from "src/application/repository/portfolio/implementation/category.repository.impl";
+import { authorize } from "src/application/presentation/middlewares/authorize";
 
 const router = Router();
 
@@ -19,8 +20,22 @@ const deps: PortfolioDeps = {
 const service = createPortfolioService(deps);
 const ctrl = portfolioController(service);
 
-router.get("/", authenticate,);
-router.
-
+router.get("/", authenticate, authorize, ctrl.getPortfolio);
+router.get("/all", authenticate, authorize, ctrl.getAllPortfolios);
+router.get("/recommend", authenticate, authorize, ctrl.getRecommendations);
+router.post(
+  "/create-from-preset",
+  authenticate,
+  authorize,
+  ctrl.createFromPreset,
+);
+router.post("/items", authenticate, authorize, ctrl.setPortfolioItems);
+router.get(
+  "/category/available",
+  authenticate,
+  authorize,
+  ctrl.getAvailableCategories,
+);
+router.get("/item/available", authenticate, authorize, ctrl.getAvailableItems);
 
 export default router;

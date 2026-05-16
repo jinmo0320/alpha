@@ -23,7 +23,7 @@ export type PlanService = {
    * @param projectId 프로젝트 ID
    * @returns 계획 정보 또는 null
    */
-  getPlan: (projectId: number) => Promise<Plan.Res.Root | null>;
+  getLatestPlan: (projectId: number) => Promise<Plan.Res.Root | null>;
 
   /**
    * 프로젝트의 모든 계획을 조회

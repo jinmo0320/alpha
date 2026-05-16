@@ -1,14 +1,29 @@
+import { UUID } from "crypto";
 import { Category } from "src/application/model/category.model";
 import { Item } from "src/application/model/item.model";
 import { Portfolio } from "src/application/model/portfolio.model";
 
 export type PortfolioService = {
   /**
-   * 프로젝트의 포트폴리오를 조회
+   * 포트폴리오 정보 조회
+   * @param portfolioId 포트폴리오 ID
+   * @returns 포트폴리오 정보 또는 null
+   */
+  getPortfolio: (portfolioId: number) => Promise<Portfolio.Res.Root | null>;
+
+  /**
+   * 프로젝트의 현재 포트폴리오를 조회
    * @param projectId 프로젝트 ID
    * @returns 포트폴리오 정보 또는 null
    */
-  getPortfolio: (projectId: number) => Promise<Portfolio.Res.Root | null>;
+  getLatestPortfolio: (projectId: number) => Promise<Portfolio.Res.Root | null>;
+
+  /**
+   * 프로젝트의 모든 포트폴리오를 조회
+   * @param projectId 프로젝트 ID
+   * @returns 포트폴리오 목록
+   */
+  getAllPortfolios: (projectId: number) => Promise<Portfolio.Res.Abstract[]>;
 
   /**
    * 추천 프리셋을 조회
@@ -25,7 +40,7 @@ export type PortfolioService = {
   createFromPreset: (req: Portfolio.Req.Create) => Promise<Portfolio.Res.Root>;
 
   /**
-   * 포트폴리오 아이템을 초기화
+   * 포트폴리오 아이템을 세팅
    * @param req 포트폴리오 ID와 아이템 설정 정보
    * @returns 설정된 포트폴리오 정보
    */

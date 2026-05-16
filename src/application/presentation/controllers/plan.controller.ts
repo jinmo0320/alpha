@@ -34,7 +34,7 @@ export const planController = (planService: PlanService) => ({
   /* ================= 프로젝트의 현재 플랜 가져오기 ================= */
   getPlan: async (req: Request, res: Response) => {
     const projectId = req.projectId!;
-    const plan = await planService.getPlan(projectId);
+    const plan = await planService.getLatestPlan(projectId);
 
     res.status(200).json({
       success: true,

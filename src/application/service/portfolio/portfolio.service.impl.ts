@@ -47,8 +47,8 @@ export const createPortfolioService = ({
   };
 
   return {
-    getPortfolio: async (projectId) => {
-      const portfolio = await portfolioRepository.get(projectId);
+    getPortfolio: async (portfolioId) => {
+      const portfolio = await portfolioRepository.get(portfolioId);
       if (!portfolio) return null;
 
       const items = await portfolioRepository.getItemsInPortfolio(portfolio.id);
@@ -61,6 +61,27 @@ export const createPortfolioService = ({
       };
       portfolioReturn.status = evaluatePortfolio(portfolioReturn);
       return portfolioReturn;
+    },
+
+    getLatestPortfolio: async (projectId) => {
+      const portfolio = await portfolioRepository.getLatest(projectId);
+      if (!portfolio) return null;
+
+      const items = await portfolioRepository.getItemsInPortfolio(portfolio.id);
+      const categories = await categorizeItems(items);
+
+      const portfolioReturn: Portfolio.Res.Root = {
+        ...portfolio,
+        categories,
+        status: "PENDING",
+      };
+      portfolioReturn.status = evaluatePortfolio(portfolioReturn);
+      return portfolioReturn;
+    },
+
+    getAllPortfolios: async (projectId) => {
+      const portfolios = await portfolioRepository.getAll(projectId);
+      return portfolios;
     },
 
     recommendPresets: async (projectId) => {
@@ -99,7 +120,7 @@ export const createPortfolioService = ({
     },
 
     setPortfolioItems: async (req) => {
-      const portfolio = await portfolioRepository.init(req);
+      const portfolio = await portfolioRepository.setItems(req);
       const items = await portfolioRepository.getItemsInPortfolio(portfolio.id);
       const categories = await categorizeItems(items);
 
