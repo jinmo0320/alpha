@@ -62,4 +62,16 @@ export const createProjectRepository = (): ProjectRepository => ({
 
     return rows.length > 0 ? Project.Map.toEntity(rows[0]) : null;
   },
+
+  hasProject: async (userId, projectId) => {
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT id
+       FROM projects
+       WHERE user_id = ? AND id = ?
+       LIMIT 1`,
+      [userId, projectId],
+    );
+
+    return rows.length > 0;
+  },
 });

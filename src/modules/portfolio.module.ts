@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticate } from "../application/presentation/middlewares/authMiddleware";
+import { authenticate } from "../application/presentation/middlewares/authenticate";
 import { loadPortfolio } from "../application/presentation/middlewares/portfolioMiddleware";
 import { portfolioController } from "../application/presentation/controllers/portfolio.controller";
 import { createPortfolioRepository } from "../application/repository/portfolio/implementation/portfolio.repository.impl";

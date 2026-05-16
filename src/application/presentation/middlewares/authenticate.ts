@@ -4,8 +4,8 @@ import { ErrorCodes } from "src/application/errors/errorCodes";
 import { createTokenProvider } from "src/externals/token/tokenProvider.impl";
 import { createUserRepository } from "src/application/repository/user/user.repository.impl";
 
-const TokenProvider = createTokenProvider();
-const UserRepository = createUserRepository();
+const tokenProvider = createTokenProvider();
+const userRepository = createUserRepository();
 
 export const authenticate = async (
   req: Request,
@@ -30,7 +30,7 @@ export const authenticate = async (
     }
 
     /* 2. 토큰 검증 */
-    const payload = TokenProvider.verifyAccessToken(token);
+    const payload = tokenProvider.verifyAccessToken(token);
     if (!payload) {
       throw new DomainError(
         ErrorCodes.AUTH.TOKEN_INVALID,
@@ -39,16 +39,13 @@ export const authenticate = async (
     }
 
     /* 3. 토큰 속 사용자 ID가 실제 유저인지 검증 */
-    const user = await UserRepository.findUserById(payload.userId);
+    const user = await userRepository.findUserById(payload.userId);
     if (!user) {
-      throw new DomainError(
-        ErrorCodes.AUTH.TOKEN_INVALID,
-        "Invalid access token.",
-      );
+      throw new DomainError(ErrorCodes.USER.NOT_FOUND, "User not found.");
     }
 
     /* 4. 토큰 속 사용자 정보 담아서 보냄 */
-    req.user = { id: payload.userId };
+    req.userId = payload.userId;
 
     next();
   } catch (e) {

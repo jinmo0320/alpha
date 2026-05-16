@@ -22,4 +22,12 @@ export type ProjectRepository = {
    * @returns 프로젝트 정보 또는 null
    */
   get: (projectId: number) => Promise<Project.Entity | null>;
+
+  /**
+   * 사용자가 해당 프로젝트를 가지고 있는지 확인
+   * @param userId 사용자 ID
+   * @param projectId 프로젝트 ID
+   * @returns 프로젝트 소유 여부
+   */
+  hasProject: (userId: UUID, projectId: number) => Promise<boolean>;
 };

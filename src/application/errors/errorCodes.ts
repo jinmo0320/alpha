@@ -28,7 +28,8 @@ export const ErrorCodes = {
   },
 
   PROJECT: {
-    NOT_FOUND: "NOT_FOUND",
+    NOT_FOUND: "PROJECT_NOT_FOUND",
+    ACCESS_DENIED: "PROJECT_ACCESS_DENIED",
   },
 
   PLAN: {

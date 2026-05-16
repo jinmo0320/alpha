@@ -31,6 +31,7 @@ const ErrorStatusMap: Record<string, number> = {
 
   /* ================= PROJECT ================= */
   [ErrorCodes.PROJECT.NOT_FOUND]: 404,
+  [ErrorCodes.PROJECT.ACCESS_DENIED]: 403,
 
   /* ================= PLAN ================= */
   [ErrorCodes.PLAN.NOT_FOUND]: 404,

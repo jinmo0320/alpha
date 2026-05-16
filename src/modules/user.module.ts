@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticate } from "src/application/presentation/middlewares/authMiddleware";
+import { authenticate } from "src/application/presentation/middlewares/authenticate";
 import { createUserRepository } from "src/application/repository/user/user.repository.impl";
 import { createBcryptHelper } from "src/externals/bcrypt/bcryptHelper.impl";
 import { userController } from "src/application/presentation/controllers/user.controller";

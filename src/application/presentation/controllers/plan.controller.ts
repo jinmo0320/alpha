@@ -53,7 +53,7 @@ export const planController = (planService: PlanService) => ({
     });
   },
 
-  /* ================= 모든 플랜 가져오기 ================= */
+  /* ================= 플랜 날짜 설정 ================= */
   setDate: async (req: Request, res: Response) => {
     const projectId = Number(req.params.projectId);
     const { startDate, paymentDay } = req.body;
