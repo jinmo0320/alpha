@@ -44,9 +44,10 @@ export const portfolioController = (portfolioService: PortfolioService) => ({
 
   /* ================= 포트폴리오 아이템 설정 ================= */
   setPortfolioItems: async (req: Request, res: Response) => {
-    const { portfolioId, items } = req.body;
+    const projectId = req.projectId!;
+    const { items } = req.body;
     const portfolio = await portfolioService.setPortfolioItems({
-      portfolioId,
+      projectId,
       items,
     });
 

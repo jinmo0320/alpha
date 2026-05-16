@@ -64,7 +64,7 @@ export namespace Portfolio {
     };
 
     export type Set = {
-      portfolioId: number;
+      projectId: number;
       items: {
         itemId: number;
         portion: number;

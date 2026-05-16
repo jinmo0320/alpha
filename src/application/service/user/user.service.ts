@@ -21,6 +21,7 @@ export type UserService = {
   /**
    * 사용자 이름과 태그를 변경
    * @param req 사용자 ID, 이름, 태그
+   * @errors NAME_ALREADY_EXISTS, USER_NOT_FOUND
    * @returns 변경된 사용자 정보
    */
   changeName: (req: User.Req.ChangeName) => Promise<User.Res.Root>;

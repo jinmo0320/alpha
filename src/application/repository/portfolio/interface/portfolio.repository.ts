@@ -56,7 +56,7 @@ export type PortfolioRepository = {
 
   /**
    * 포트폴리오 아이템을 세팅
-   * @param req 포트폴리오 ID와 아이템 설정 정보
+   * @param req 프로젝트 ID와 아이템 설정 정보
    * @returns 설정된 포트폴리오 정보
    */
   setItems: (req: Portfolio.Req.Set) => Promise<Portfolio.Entity>;

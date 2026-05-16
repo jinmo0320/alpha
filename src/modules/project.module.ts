@@ -14,7 +14,7 @@ import { createPortfolioRepository } from "src/application/repository/portfolio/
 import { createPlanRepository } from "src/application/repository/plan/plan.repository.impl";
 import { createCategoryRepository } from "src/application/repository/portfolio/implementation/category.repository.impl";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 const depsPortfolio: PortfolioDeps = {
   portfolioRepository: createPortfolioRepository(),

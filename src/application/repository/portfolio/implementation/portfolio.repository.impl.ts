@@ -245,9 +245,10 @@ export const createPortfolioRepository = (): PortfolioRepository => ({
           pp.project_id AS projectId
          FROM portfolios p
          JOIN project_portfolios pp ON pp.portfolio_id = p.id
-         WHERE p.id = ?
+         WHERE pp.project_id = ?
+         ORDER BY pp.version DESC
          LIMIT 1`,
-        [req.portfolioId],
+        [req.projectId],
       );
       if (currentRows.length === 0) throw new Error("Portfolio not found");
 

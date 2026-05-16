@@ -6,7 +6,7 @@ import { createPlanService } from "../application/service/plan/plan.service.impl
 import { PlanDeps } from "src/application/service/plan/plan.deps";
 import { authorize } from "src/application/presentation/middlewares/authorize";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 const deps: PlanDeps = {
   planRepository: createPlanRepository(),
