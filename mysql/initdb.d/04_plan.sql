@@ -1,13 +1,14 @@
 CREATE TABLE plans (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    initial_amount BIGINT,
-    monthly_amount INT,
-    start_date DATE,
+    initial_amount BIGINT NOT NULL,
+    monthly_amount INT NOT NULL,
+    start_date DATE NOT NULL,
+    period INT NOT NULL,
+    expected_return DECIMAL(5,4) NOT NULL,
+    target_amount BIGINT NOT NULL,
+
     payment_day TINYINT,
-    period INT,
-    expected_return DECIMAL(5,4),
-    target_amount BIGINT,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -16,8 +17,7 @@ CREATE TABLE plans (
 CREATE TABLE project_plans (
     project_id INT NOT NULL,
     plan_id INT NOT NULL UNIQUE,
-    version INT NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
+    version INT NOT NULL DEFAULT 1,
 
     PRIMARY KEY (project_id, plan_id),
     UNIQUE (project_id, version),

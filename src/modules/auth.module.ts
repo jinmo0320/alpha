@@ -6,9 +6,9 @@ import { createEmailSender } from "src/externals/email/emailSender.impl";
 import { createTokenProvider } from "src/externals/token/tokenProvider.impl";
 import { createBcryptHelper } from "src/externals/bcrypt/bcryptHelper.impl";
 
-import { AuthDeps } from "src/application/service/auth/interface/auth.deps";
-import { AuthService } from "src/application/service/auth/interface/auth.service";
-import { createAuthService } from "src/application/service/auth/implementation/auth.service.impl";
+import { AuthDeps } from "src/application/service/auth/auth.deps";
+import { AuthService } from "src/application/service/auth/auth.service";
+import { createAuthService } from "src/application/service/auth/auth.service.impl";
 import { authContoller } from "src/application/presentation/controllers/auth.controller";
 
 const router = Router();

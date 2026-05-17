@@ -23,17 +23,23 @@ const ErrorStatusMap: Record<string, number> = {
   /* ================= USER ================= */
   [ErrorCodes.USER.NOT_FOUND]: 404,
   [ErrorCodes.USER.CURRENT_PASSWORD_NOT_MATCHED]: 401,
+  [ErrorCodes.USER.NAME_ALREADY_EXISTS]: 409,
+  [ErrorCodes.USER.INVALID_RISK_SCORE]: 400,
 
   /* ================= SURVEY ================= */
   [ErrorCodes.SURVEY.QUESTIONS_NOT_FOUND]: 404,
 
-  /* ================= INV_PROFILE ================= */
-  [ErrorCodes.INV_PROFILE.INVALID_RISK_SCORE]: 400,
-  [ErrorCodes.INV_PROFILE.INVALID_INVESTMENT_PLAN]: 400,
-  [ErrorCodes.INV_PROFILE.INVESTMENT_PROFILE_NOT_FOUND]: 404,
+  /* ================= PROJECT ================= */
+  [ErrorCodes.PROJECT.NOT_FOUND]: 404,
+  [ErrorCodes.PROJECT.ACCESS_DENIED]: 403,
+
+  /* ================= PLAN ================= */
+  [ErrorCodes.PLAN.NOT_FOUND]: 404,
+  [ErrorCodes.PLAN.INVALID_INVESTMENT_PLAN]: 400,
 
   /* ================= PORTFOLIO ================= */
   [ErrorCodes.PORTFOLIO.NOT_FOUND]: 404,
+  [ErrorCodes.PORTFOLIO.INVALID_ITEMS]: 409,
   [ErrorCodes.PORTFOLIO.INVALID_PORTIONS]: 400,
   [ErrorCodes.PORTFOLIO.INVALID_DATA_FOR_ADDING_CATEGORY]: 400,
   [ErrorCodes.PORTFOLIO.INVALID_DATA_FOR_ADDING_ITEM]: 400,

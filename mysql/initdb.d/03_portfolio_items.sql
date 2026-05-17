@@ -2,10 +2,8 @@ CREATE TABLE portfolios (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
     name VARCHAR(100),
-    description TEXT,
-    status ENUM('PENDING', 'STABLE', 'DISABLED') NOT NULL,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
+    min_return DECIMAL(5,4) NOT NULL,
+    max_return DECIMAL(5,4) NOT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -14,8 +12,7 @@ CREATE TABLE portfolios (
 CREATE TABLE project_portfolios (
     project_id INT NOT NULL,
     portfolio_id INT NOT NULL,
-    version INT NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
+    version INT NOT NULL DEFAULT 1,
 
     PRIMARY KEY (project_id, portfolio_id),
     UNIQUE (portfolio_id),
@@ -37,8 +34,8 @@ CREATE TABLE items (
 
     name VARCHAR(50) NOT NULL,
     description TEXT,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
+    min_return DECIMAL(5,4) NOT NULL,
+    max_return DECIMAL(5,4) NOT NULL,
 
     UNIQUE (id, category_id),
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
@@ -50,7 +47,7 @@ CREATE TABLE item_allocation (
     category_id INT NOT NULL,
 
     alias VARCHAR(50),
-    description TEXT,
+    alias_description TEXT,
     portion DECIMAL(5,4) DEFAULT 0,
 
     PRIMARY KEY (portfolio_id, item_id),
@@ -87,8 +84,8 @@ CREATE TABLE portfolio_presets (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     target_return_percent INT NOT NULL,
-    min_return DECIMAL(5,4),
-    max_return DECIMAL(5,4),
+    min_return DECIMAL(5,4) NOT NULL,
+    max_return DECIMAL(5,4) NOT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
