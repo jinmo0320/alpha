@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { surveyController } from "src/application/presentation/controllers/survey.controller";
 import { createSurveyRepository } from "src/application/repository/survey/survey.repository.impl";
-import { createSurveyService } from "src/application/service/survey/implementation/survey.service.impl";
-import { SurveyDeps } from "src/application/service/survey/interface/survey.deps";
-import { SurveyService } from "src/application/service/survey/interface/survey.service";
+import { createSurveyService } from "src/application/service/survey/survey.service.impl";
+import { SurveyDeps } from "src/application/service/survey/survey.deps";
+import { SurveyService } from "src/application/service/survey/survey.service";
 
 const router = Router();
 

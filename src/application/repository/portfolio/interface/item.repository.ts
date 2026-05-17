@@ -1,44 +1,32 @@
 import { UUID } from "crypto";
-import { Portfolio, ExpectedReturn } from "../entity/portfolio.entity";
+import { Item } from "src/application/model/item.model";
 
 export type ItemRepository = {
   /**
-   * 사용자가 소유한 모든 아이템을 반환
+   * 사용자의 아이템 목록을 조회
    * @param userId 사용자 ID
+   * @returns 아이템 목록
    */
-  getAll: (userId: UUID) => Promise<Portfolio.Item[]>;
+  getAll: (userId: UUID) => Promise<Item.Entity[]>;
 
   /**
-   * 새로운 아이템을 생성
-   * @param userId 사용자 ID
-   * @param info 아이템 정보 (이름, 설명)
-   * @param expectedReturn 아이템의 기대 수익률
-   * @param categoryId 아이템이 속할 카테고리 ID
+   * 아이템을 생성
+   * @param req 아이템 생성 정보
+   * @returns 생성된 아이템 정보
    */
-  create: (
-    userId: UUID,
-    info: { name: string; description?: string },
-    expectedReturn: ExpectedReturn,
-    categoryId: number,
-  ) => Promise<void>;
+  create: (req: Item.Req.Create) => Promise<Item.Entity>;
 
   /**
-   * 기존 아이템을 업데이트
-   * @param itemId 업데이트할 아이템 ID
-   * @param info 업데이트할 아이템 정보 (이름, 설명)
-   * @param expectedReturn 업데이트할 아이템의 기대 수익률
-   * @param categoryId 업데이트할 아이템이 속할 카테고리 ID
+   * 아이템을 업데이트
+   * @param req 아이템 업데이트 정보
+   * @returns 업데이트된 아이템 정보
    */
-  update: (
-    itemId: number,
-    info?: { name?: string; description?: string },
-    expectedReturn?: ExpectedReturn,
-    categoryId?: number,
-  ) => Promise<void>;
+  update: (req: Item.Req.Update) => Promise<Item.Entity>;
 
   /**
    * 아이템을 삭제
    * @param itemId 삭제할 아이템 ID
+   * @returns 없음
    */
   delete: (itemId: number) => Promise<void>;
 };

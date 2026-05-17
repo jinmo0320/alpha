@@ -1,83 +1,100 @@
 import { Request, Response } from "express";
-import { PlanService } from "../../service/plan/interface/plan.service";
-import { isValidPlanReqDto } from "../../service/plan/dto/plan.dto";
-
-const readProjectId = (value: unknown): number | null => {
-  const projectId = Number(value);
-  return Number.isInteger(projectId) && projectId > 0 ? projectId : null;
-};
-
-const readPlanPayload = (body: any) => body.plan ?? body;
-
-const badRequest = (res: Response, message: string) => {
-  res.status(400).json({ success: false, message });
-};
+import { PlanService } from "../../service/plan/plan.service";
 
 export const planController = (planService: PlanService) => ({
-  getPlan: async (req: Request, res: Response) => {
-    const projectId = readProjectId(req.query.projectId);
-    if (!projectId) {
-      badRequest(res, "projectId is required.");
-      return;
-    }
+  /* ================= 플랜 생성 ================= */
+  createPlan: async (req: Request, res: Response) => {
+    const projectId = req.projectId!;
+    const {
+      initialAmount,
+      monthlyAmount,
+      startDate,
+      period,
+      expectedReturn,
+      targetAmount,
+    } = req.body;
 
-    const plan = await planService.getPlan({ projectId });
-    res.status(200).json({
+    const plan = await planService.createPlan({
+      projectId,
+      initialAmount,
+      monthlyAmount,
+      startDate,
+      period,
+      expectedReturn,
+      targetAmount,
+    });
+
+    res.status(201).json({
       success: true,
-      message: "Successfully fetched.",
+      message: "Created plan.",
       data: { plan },
     });
   },
 
-  createPlan: async (req: Request, res: Response) => {
-    const projectId = readProjectId(req.body.projectId ?? req.query.projectId);
-    const plan = readPlanPayload(req.body);
-    if (!projectId) {
-      badRequest(res, "projectId is required.");
-      return;
-    }
-    if (!isValidPlanReqDto(plan)) {
-      badRequest(res, "Invalid plan request.");
-      return;
-    }
+  /* ================= 프로젝트의 현재 플랜 가져오기 ================= */
+  getPlan: async (req: Request, res: Response) => {
+    const projectId = req.projectId!;
+    const plan = await planService.getLatestPlan(projectId);
 
-    await planService.createPlan({ projectId, plan });
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "Created plan.",
+      message: "Plan fetched successfully.",
+      data: { plan },
     });
   },
 
+  /* ================= 모든 플랜 가져오기 ================= */
+  getAllPlans: async (req: Request, res: Response) => {
+    const projectId = req.projectId!;
+    const plans = await planService.getAllPlans(projectId);
+
+    res.status(200).json({
+      success: true,
+      message: "Plans fetched successfully.",
+      data: { plans },
+    });
+  },
+
+  /* ================= 플랜 날짜 설정 ================= */
+  setDate: async (req: Request, res: Response) => {
+    const projectId = req.projectId!;
+    const { paymentDay } = req.body;
+    await planService.setDate({
+      projectId,
+      paymentDay,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Plan date updated successfully.",
+    });
+  },
+
+  /* ================= 플랜 수정하기 ================= */
   updatePlan: async (req: Request, res: Response) => {
-    const projectId = readProjectId(req.body.projectId ?? req.query.projectId);
-    const plan = readPlanPayload(req.body);
-    if (!projectId) {
-      badRequest(res, "projectId is required.");
-      return;
-    }
-    if (!isValidPlanReqDto(plan)) {
-      badRequest(res, "Invalid plan request.");
-      return;
-    }
-
-    await planService.updatePlan({ projectId, plan });
-    res.status(200).json({
-      success: true,
-      message: "Updated plan.",
+    const projectId = Number(req.params.projectId);
+    const {
+      initialAmount,
+      monthlyAmount,
+      startDate,
+      period,
+      expectedReturn,
+      targetAmount,
+    } = req.body;
+    const plan = await planService.updatePlan({
+      projectId,
+      initialAmount,
+      monthlyAmount,
+      startDate,
+      period,
+      expectedReturn,
+      targetAmount,
     });
-  },
 
-  clearPlan: async (req: Request, res: Response) => {
-    const projectId = readProjectId(req.body.projectId ?? req.query.projectId);
-    if (!projectId) {
-      badRequest(res, "projectId is required.");
-      return;
-    }
-
-    await planService.clearPlan(projectId);
     res.status(200).json({
       success: true,
-      message: "Cleared plan.",
+      message: "Plan updated successfully.",
+      data: { plan },
     });
   },
 });

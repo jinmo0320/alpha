@@ -8,7 +8,6 @@ import userRoutes from "./modules/user.module";
 import surveyRoutes from "./modules/survey.module";
 import planRoutes from "./modules/plan.module";
 import portfolioRoutes from "./modules/portfolio.module";
-import paymentRoutes from "./modules/payment.module";
 import projectRoutes from "./modules/project.module";
 
 import errorMiddleware from "./application/presentation/middlewares/errorMiddleware";
@@ -41,13 +40,12 @@ app.use(
 );
 
 /** api */
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 router.use("/auth", authRoutes);
 router.use("/users/me", userRoutes);
 router.use("/surveys", surveyRoutes);
-router.use("/users/me/plan", planRoutes);
-router.use("/users/me/portfolio", portfolioRoutes);
-router.use("/users/me/payment", paymentRoutes);
+router.use("/projects/:projectId/plan", planRoutes);
+router.use("/projects/:projectId/portfolio", portfolioRoutes);
 router.use("/projects", projectRoutes);
 
 app.use("/api/v1", router);

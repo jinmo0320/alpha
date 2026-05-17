@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AuthService } from "../../service/auth/interface/auth.service";
+import { AuthService } from "../../service/auth/auth.service";
 
 export const authContoller = (authService: AuthService) => ({
   /* ================= 회원가입 ================= */
@@ -47,6 +47,7 @@ export const authContoller = (authService: AuthService) => ({
       success: true,
       message: "Verification email sent",
       data: {
+        email,
         createdAt,
         expiredAt,
       },
@@ -71,6 +72,7 @@ export const authContoller = (authService: AuthService) => ({
       success: true,
       message: "Forgot password email sent",
       data: {
+        email,
         createdAt,
         expiredAt,
       },
@@ -81,7 +83,10 @@ export const authContoller = (authService: AuthService) => ({
   checkForgotCode: async (req: Request, res: Response) => {
     const { email, code } = req.body;
     await authService.checkForgotCode({ email, code });
-    res.status(200).json({ success: true, message: "Email verified" });
+    res.status(200).json({
+      success: true,
+      message: "Password reset code verified.",
+    });
   },
 
   /* ================= 비밀번호 재설정 ================= */

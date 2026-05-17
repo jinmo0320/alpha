@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import db from "src/externals/database/db";
 import { SurveyRepository } from "src/application/repository/survey/survey.repository";
-import { Survey } from "src/application/repository/survey/entity/survey.entity";
+import { Survey } from "src/application/model/survey.model";
 
 export const createSurveyRepository = (): SurveyRepository => ({
   getInvestmentQuestions: async () => {
@@ -37,7 +37,7 @@ export const createSurveyRepository = (): SurveyRepository => ({
       questionMap.get(row.question_id)!.answers.push(row.answer_text);
     });
 
-    const questions: Survey.Question[] = Array.from(questionMap.values())
+    const questions: Survey.Entity[] = Array.from(questionMap.values())
       .sort((a, b) => a.order - b.order)
       .map((q) => ({
         title: q.text,

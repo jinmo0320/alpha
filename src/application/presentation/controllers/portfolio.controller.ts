@@ -1,142 +1,93 @@
 import { Request, Response } from "express";
-import { PortfolioService } from "../../service/portfolio/interface/portfolio.service";
+import { PortfolioService } from "../../service/portfolio/portfolio.service";
 
 export const portfolioController = (portfolioService: PortfolioService) => ({
-  // === 포폴 전체 & 추천 ===
-  getMyPortfolio: async (req: Request, res: Response) => {
-    const portfolio = await portfolioService.getPortfolio(req.user!.id);
+  /* ================= 모든 포트폴리오 조회 ================= */
+  getAllPortfolios: async (req: Request, res: Response) => {
+    const projectId = req.projectId!;
+    const portfolios = await portfolioService.getAllPortfolios(projectId);
+
     res.status(200).json({
       success: true,
-      message: "포트폴리오를 가져왔습니다.",
-      data: { portfolio },
+      message: "Portfolios fetched successfully.",
+      data: { portfolios },
     });
   },
 
+  /* ================= 포트폴리오 프리셋 추천 ================= */
   getRecommendations: async (req: Request, res: Response) => {
-    const presets = await portfolioService.getRecommendations(req.user!.id);
+    const projectId = Number(req.params.projectId);
+    const presets = await portfolioService.recommendPresets(projectId);
+
     res.status(200).json({
       success: true,
-      message: "추천 포트폴리오 프리셋을 가져왔습니다",
+      message: "Portfolio presets fetched successfully.",
       data: { presets },
     });
   },
 
+  /* ================= 포폴 프리셋으로 생성 ================= */
   createFromPreset: async (req: Request, res: Response) => {
-    const { presetCode } = req.body; // 프론트에서 선택한 프리셋 코드
-    await portfolioService.createFromPreset({
-      userId: req.user!.id,
+    const projectId = req.projectId!;
+    const { presetCode } = req.body;
+    const portfolio = await portfolioService.createFromPreset({
+      projectId,
       presetCode,
     });
+
     res.status(201).json({
       success: true,
       message: "Portfolio created from preset successfully.",
+      data: { portfolio },
     });
   },
 
-  // === 자산군 ===
-  getCategories: async (req: Request, res: Response) => {
-    const categories = await portfolioService.getCategories(
-      req.user!.portfolioId!,
-    );
-    res.status(200).json({
+  /* ================= 포트폴리오 아이템 설정 ================= */
+  setPortfolioItems: async (req: Request, res: Response) => {
+    const projectId = req.projectId!;
+    const { items } = req.body;
+    const portfolio = await portfolioService.setPortfolioItems({
+      projectId,
+      items,
+    });
+
+    res.status(201).json({
       success: true,
-      message: "카테고리를 가져왔습니다",
-      data: { categories },
+      message: "Portfolio items updated successfully.",
+      data: { portfolio },
     });
   },
 
-  updateCategoryPortions: async (req: Request, res: Response) => {
-    await portfolioService.updateCategoryPortions({
-      portfolioId: req.user!.portfolioId!,
-      portions: req.body.categoryPortions,
-    });
-    res
-      .status(200)
-      .json({ success: true, message: "Asset Categories updated." });
-  },
-
-  deleteCategory: async (req: Request, res: Response) => {
-    await portfolioService.deleteCategory({
-      portfolioId: req.user!.portfolioId!,
-      categoryId: Number(req.params.categoryId),
-    });
-    res.status(200).json({ success: true, message: "Asset Category deleted." });
-  },
-
+  /* ================= 추가 가능한 카테고리 조회 ================= */
   getAvailableCategories: async (req: Request, res: Response) => {
-    const categories = await portfolioService.getAvailableCategories(
-      req.user!.portfolioId!,
-    );
+    const userId = req.userId!;
+    const { portfolioId } = req.body;
+    const categories = await portfolioService.getAvailableCategories({
+      userId,
+      portfolioId,
+    });
+
     res.status(200).json({
       success: true,
-      message: "추가 가능한 카테고리를 가져왔습니다.",
+      message: "Available categories fetched successfully.",
       data: { categories },
     });
   },
 
-  // === 자산군 내 하위 자산 ===
-  getItemsRelative: async (req: Request, res: Response) => {
-    const items = await portfolioService.getItemsRelative({
-      portfolioId: req.user!.portfolioId!,
-      categoryId: Number(req.params.categoryId),
-    });
-    res.status(200).json({
-      success: true,
-      message: "상대 비중으로 아이템을 가져왔습니다.",
-      data: { items },
-    });
-  },
-
-  updateItemRelativePortions: async (req: Request, res: Response) => {
-    await portfolioService.updateItemRelativePortions({
-      portfolioId: req.user!.portfolioId!,
-      categoryId: Number(req.params.categoryId),
-      portions: req.body.itemPortions,
-    });
-    res
-      .status(200)
-      .json({ success: true, message: "Relative portions updated." });
-  },
-
+  /* ================= 추가 가능한 아이템 조회 ================= */
   getAvailableItems: async (req: Request, res: Response) => {
-    const list = await portfolioService.getAvailableItems({
-      categoryId: Number(req.params.categoryId),
+    const userId = req.userId!;
+    const { portfolioId, categoryId } = req.body;
+    const items = await portfolioService.getAvailableItems({
+      userId,
+      portfolioId,
+      categoryId,
     });
-    res.status(200).json({
-      success: true,
-      message: "추가 가능한 아이템을 가져왔습니다.",
-      data: { list },
-    });
-  },
 
-  // === 개별 하위 자산 ===
-  getItemsAbsolute: async (req: Request, res: Response) => {
-    const items = await portfolioService.getItemsAbsolute(
-      req.user!.portfolioId!,
-    );
     res.status(200).json({
       success: true,
-      message: "절대 비중으로 아이템을 가져왔습니다.",
+      message: "Available items fetched successfully.",
       data: { items },
     });
   },
-
-  updateItemAbsolutePortions: async (req: Request, res: Response) => {
-    await portfolioService.updateItemAbsolutePortions({
-      portfolioId: req.user!.portfolioId!,
-      portions: req.body.itemPortions,
-    });
-    res
-      .status(200)
-      .json({ success: true, message: "Absolute portions updated." });
-  },
-
-  deleteItem: async (req: Request, res: Response) => {
-    await portfolioService.deleteItem({
-      portfolioId: req.user!.portfolioId!,
-      itemId: Number(req.params.itemId),
-    });
-    res.status(200).json({ success: true, message: "Asset Item deleted." });
-  },
-
 });
